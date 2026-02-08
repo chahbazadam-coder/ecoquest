@@ -2,9 +2,9 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 /*
  ═══════════════════════════════════════════════════════════
- 🌍 EcoQuest — Sustainability App for Kids
- Duolingo-inspired: stories, games, lessons, garden, dashboard
- Full auth, database, achievements, XP system
+ 🌍 EcoQuest V4 — THE MEGA UPDATE
+ 14 stories, 15 lessons, 11 games, world map, trading cards,
+ eco missions, animal encyclopedia, journal, pet evolution, crafting
  ═══════════════════════════════════════════════════════════
 */
 
@@ -13,7 +13,7 @@ const DB = {
   users: {},
   createUser(u, p, av) {
     if (this.users[u]) return null;
-    const user = { id: Date.now().toString(36), username: u, password: p, avatar: av || "🌱", level: 1, xp: 0, streak: 1, completedLessons: [], completedStories: [], completedChallenges: [], achievements: [], ecoCoins: 50, garden: [], carbonSaved: 0, gamesPlayed: 0, pet: null, petName: "", petHappiness: 100, craftedItems: [], quizBest: 0, joinDate: new Date().toISOString() };
+    const user = { id: Date.now().toString(36), username: u, password: p, avatar: av || "🌱", level: 1, xp: 0, streak: 1, completedLessons: [], completedStories: [], completedChallenges: [], achievements: [], ecoCoins: 50, garden: [], carbonSaved: 0, gamesPlayed: 0, pet: null, petName: "", petHappiness: 100, craftedItems: [], quizBest: 0, cards: [], journal: [], missions: [], worldVisited: [], friends: 0, joinDate: new Date().toISOString() };
     this.users[u] = user;
     return { ...user };
   },
@@ -104,7 +104,25 @@ const STORIES = [
   {id:"s8",title:"Zephyr the Wind Turbine",emoji:"🌬️",xp:45,cat:"energy",color:"#06B6D4",
     pages:[{t:"Zephyr the new turbine spun her blades — 500 homes lit up!",img:"🌬️💡✨"},{t:"No smoke, no pollution. Clean energy from the wind!",img:"🏠🏠💚"},{t:"The old coal plant got quieter as families chose wind power.",img:"🏭📉🌬️"},{t:"It shut down for good. Bluer sky, cleaner air, happy kids!",img:"☀️👧💙"}],
     quiz:[{q:"One turbine powers:",opts:["5","50","500","5000"],ans:2},{q:"Coal plant:",opts:["Grew","Shut down","Moved","Nothing"],ans:1},{q:"Wind advantage:",opts:["Expensive","No pollution","Loud","Ugly"],ans:1}]},
-];
+
+  {id:"s9",title:"The Last Polar Bear",emoji:"🐻‍❄️",xp:45,cat:"climate",color:"#93C5FD",
+    pages:[{t:"Koda the polar bear cub watched the ice shrink every summer. His home was melting.",img:"🐻‍❄️🧊😢"},{t:"His mother couldn't find seals anymore — the ice was too thin to hunt on.",img:"🐻‍❄️🦭💔"},{t:"Scientists arrived to study the bears. They discovered the Arctic was warming twice as fast!",img:"🔬🌡️📊"},{t:"A girl named Mika saw the documentary and organized her whole school to go carbon-neutral.",img:"👧🏫💚"},{t:"Schools worldwide joined the Arctic Promise. Emissions started dropping!",img:"🌍📉✊"},{t:"Years later, Koda's cubs had strong ice to play on. Hope won.",img:"🐻‍❄️🐻‍❄️🧊😊"}],
+    quiz:[{q:"Why was ice melting?",opts:["Too many bears","Global warming","Earthquakes","Moon gravity"],ans:1},{q:"Arctic warms ___ as fast",opts:["Half","Same","Twice","Ten times"],ans:2},{q:"What helped?",opts:["More factories","Reducing emissions","Ignoring it","Building walls"],ans:1}]},
+  {id:"s10",title:"The Underground Forest",emoji:"🍄",xp:50,cat:"biodiversity",color:"#A78BFA",
+    pages:[{t:"Under every forest lies a secret network — fungi connecting every tree like an internet!",img:"🌳🍄🌐"},{t:"Trees share food through fungal threads. A mother tree feeds her babies underground!",img:"🌳➡️🍄➡️🌱"},{t:"When loggers cut the oldest tree, the whole forest weakened. The network broke.",img:"🪓😢🌲"},{t:"Scientist Dr. Roots discovered if you protect the oldest trees, the network stays strong!",img:"🔬🌳💪"},{t:"New laws protected ancient trees. The wood-wide-web healed itself!",img:"📜🌲🕸️✨"}],
+    quiz:[{q:"Trees communicate through...",opts:["Radio","Fungi networks","Telepathy","Wind"],ans:1},{q:"Oldest trees are called...",opts:["Mother trees","King trees","Dead trees","Baby trees"],ans:0},{q:"The network is called...",opts:["Treebook","Wood-wide-web","Forest phone","Root radio"],ans:1}]},
+  {id:"s11",title:"River's Journey Home",emoji:"🐟",xp:45,cat:"water",color:"#38BDF8",
+    pages:[{t:"Finn the salmon was born in a crystal-clear mountain stream.",img:"🐟🏔️💧"},{t:"He swam downstream to the ocean, growing strong for three years.",img:"🐟🌊💪"},{t:"When it was time to return home to lay eggs, the river was blocked by a dam!",img:"🐟🧱😰"},{t:"Environmentalists built a fish ladder — steps of flowing water around the dam!",img:"🪜🐟💨"},{t:"Finn leaped up each step and made it home. His babies would be born in clean water!",img:"🐟🥚🌈"}],
+    quiz:[{q:"Salmon return to...",opts:["Ocean","Birth stream","Any river","Lake"],ans:1},{q:"What blocked the river?",opts:["Fish","Dam","Waterfall","Nothing"],ans:1},{q:"Solution was...",opts:["Remove fish","Fish ladder","New river","Helicopter"],ans:1}]},
+  {id:"s12",title:"The City That Went Green",emoji:"🏙️",xp:50,cat:"energy",color:"#34D399",
+    pages:[{t:"Smokedale was the most polluted city in the country. Gray skies, sick people.",img:"🏭🌫️😷"},{t:"New mayor Dr. Green had a bold plan: 100% renewable energy in 10 years!",img:"👩‍💼☀️📋"},{t:"Solar panels covered every roof. Wind turbines lined the hills.",img:"☀️🏠🌬️"},{t:"Electric buses replaced diesel. Bike lanes appeared everywhere!",img:"🚌⚡🚲"},{t:"Trees were planted along every street. Green rooftops bloomed!",img:"🌳🏢🌻"},{t:"In 8 years, Smokedale became Greendale — the cleanest city in the world!",img:"🏙️💚🌈"}],
+    quiz:[{q:"What was the goal?",opts:["More factories","100% renewable","More cars","Bigger city"],ans:1},{q:"How long did it take?",opts:["1 year","5 years","8 years","100 years"],ans:2},{q:"Key changes included...",opts:["More coal","Solar & wind","More roads","Nothing"],ans:1}]},
+  {id:"s13",title:"Whispering Wolves",emoji:"🐺",xp:50,cat:"biodiversity",color:"#FB923C",
+    pages:[{t:"Yellowstone had a problem — too many elk eating all the plants. Rivers were eroding!",img:"🦌🦌🌿😟"},{t:"Scientists had a wild idea: bring back the wolves that were hunted to extinction there!",img:"🐺🔬💡"},{t:"With wolves back, elk moved away from riverbanks. Trees grew tall again!",img:"🐺🌳🌊"},{t:"The trees cooled the rivers. Fish returned. Eagles came for the fish!",img:"🐟🦅🌲"},{t:"Even the rivers changed course! Wolves had fixed the whole ecosystem!",img:"🐺🏞️✨"},{t:"This is called a trophic cascade — one species changing everything!",img:"🔄🌍🐺"}],
+    quiz:[{q:"What was eating all the plants?",opts:["Wolves","Elk","Bears","Fish"],ans:1},{q:"A trophic cascade means...",opts:["Waterfall","One species changes ecosystem","Wolf howl","Nothing"],ans:1},{q:"Wolves helped...",opts:["Only themselves","The entire ecosystem","No one","Just elk"],ans:1}]},
+  {id:"s14",title:"The Girl Who Planted a Million",emoji:"🌱",xp:55,cat:"forests",color:"#84CC16",
+    pages:[{t:"At age 9, Wangari looked at the bare mountains of Kenya. All the trees had been cut!",img:"👧⛰️🪓"},{t:"Without trees, soil washed away. Rivers dried up. Families went hungry.",img:"🏜️💧😢"},{t:"Wangari had one idea: plant trees. She started with just seven seedlings.",img:"👧🌱7️⃣"},{t:"She taught other women to grow nurseries. They earned money selling seedlings!",img:"👩‍🌾🌱💰"},{t:"The movement spread across Africa. Millions of trees grew on bare hillsides!",img:"🌳🌳🌍"},{t:"Wangari won the Nobel Peace Prize. One person with one idea changed the world!",img:"👧🏆🌍"},{t:"Today, over 51 MILLION trees stand because of her. What will YOU start?",img:"🌳🌳🌳✨"}],
+    quiz:[{q:"Wangari started with...",opts:["A million trees","Seven seedlings","One forest","Nothing"],ans:1},{q:"She won the...",opts:["Grammy","Oscar","Nobel Peace Prize","Gold medal"],ans:2},{q:"How many trees total?",opts:["100","10,000","1 million","51 million+"],ans:3}]},];
 
 const LESSONS = [
   { id:"l1", title:"What is Recycling?", emoji:"♻️", cat:"waste", xp:20, color:"#22C55E",
@@ -166,7 +184,22 @@ const LESSONS = [
   {id:"l10",title:"Food Waste",emoji:"🍕",cat:"waste",xp:35,color:"#14B8A6",
     content:"1/3 of all food produced is wasted — 1.3 billion tons/year! If food waste were a country, it'd be the 3rd largest CO2 emitter! Plan meals, eat leftovers, compost scraps.",
     qs:[{q:"Food wasted:",opts:["1%","10%","About 1/3","All"],ans:2},{q:"Food waste CO2 ranking:",opts:["Last","10th","3rd","1st"],ans:2},{q:"Leftovers should be trashed",type:"tf",ans:false},{q:"Reduce by:",opts:["Cook excess","Plan & eat leftovers","Only candy","Skip meals"],ans:1}]},
-];
+
+  {id:"l11",title:"Deforestation",emoji:"🪓",cat:"forests",xp:35,color:"#DC2626",
+    content:"We lose 10 million hectares of forest per year — that's 27 football fields every MINUTE! Forests absorb CO2, prevent floods, and house 80% of land animals. Buying sustainable products and reducing paper use helps!",
+    qs:[{q:"Forest lost per year?",opts:["100 acres","10 million hectares","1 tree","None"],ans:1},{q:"Forests house _% of land animals",opts:["10%","50%","80%","100%"],ans:2},{q:"Deforestation causes flooding",type:"tf",ans:true},{q:"Help by:",opts:["Cut more","Buy sustainable products","Burn forests","Ignore"],ans:1}]},
+  {id:"l12",title:"Ocean Acidification",emoji:"🧪",cat:"ocean",xp:40,color:"#7C3AED",
+    content:"Oceans absorb 30% of CO2, making seawater acidic. Acid dissolves shells of oysters, coral, and tiny plankton that make half our oxygen! If we lose plankton, we lose half our air supply!",
+    qs:[{q:"Oceans absorb _% of CO2",opts:["5%","15%","30%","90%"],ans:2},{q:"Acid harms:",opts:["Rocks","Shells & coral","Sand","Nothing"],ans:1},{q:"Plankton make half our oxygen",type:"tf",ans:true},{q:"This matters because:",opts:["Only fish care","We need plankton for oxygen","Acid is tasty","Nothing"],ans:1}]},
+  {id:"l13",title:"Sustainable Transport",emoji:"🚲",cat:"energy",xp:35,color:"#0891B2",
+    content:"Transport = 16% of global emissions! A car emits 4.6 tons CO2/year. Electric vehicles cut that by 50-70%. But the greenest options? Walking, cycling, and public transport! One bus replaces 40 cars!",
+    qs:[{q:"Transport emissions share:",opts:["1%","5%","16%","50%"],ans:2},{q:"Greenest transport?",opts:["SUV","Helicopter","Walking/cycling","Sports car"],ans:2},{q:"One bus replaces 40 cars",type:"tf",ans:true},{q:"EVs reduce emissions by:",opts:["0%","10%","50-70%","100%"],ans:2}]},
+  {id:"l14",title:"Soil Health",emoji:"🪱",cat:"biodiversity",xp:40,color:"#92400E",
+    content:"1 tablespoon of soil has more organisms than people on Earth! Healthy soil stores carbon, filters water, and grows our food. But intensive farming destroys soil — it takes 500 years to make 1 inch of topsoil!",
+    qs:[{q:"1 tbsp soil has...",opts:["Nothing","Some bugs","More organisms than humans on Earth","A few worms"],ans:2},{q:"Topsoil creation time for 1 inch:",opts:["1 year","10 years","100 years","500 years"],ans:3},{q:"Healthy soil stores carbon",type:"tf",ans:true},{q:"Soil is alive with:",opts:["Nothing","Billions of organisms","Only worms","Just dirt"],ans:1}]},
+  {id:"l15",title:"Green Buildings",emoji:"🏗️",cat:"energy",xp:40,color:"#059669",
+    content:"Buildings use 40% of global energy! Green buildings use solar panels, rainwater collection, natural light, and living walls. A green roof can reduce building energy use by 25% and filter air pollution!",
+    qs:[{q:"Buildings use _% of energy",opts:["10%","25%","40%","80%"],ans:2},{q:"Green roofs save:",opts:["Nothing","5%","25% energy","All energy"],ans:2},{q:"Living walls filter pollution",type:"tf",ans:true},{q:"Green building features:",opts:["More concrete","Solar + rainwater + natural light","Bigger parking","Taller buildings"],ans:1}]},];
 
 const GARDEN_SHOP = [
   {id:"p1",name:"Sunflower",emoji:"🌻",cost:20,type:"flower"},{id:"p2",name:"Oak Tree",emoji:"🌳",cost:50,type:"tree"},
@@ -202,6 +235,13 @@ const DAILY_CHALLENGES = [
   {id:"dc5",title:"5-min shower",emoji:"🚿",xp:10,desc:"Time your shower — under 5 minutes!"},
   {id:"dc6",title:"Pick up litter",emoji:"🗑️",xp:20,desc:"Pick up 5 pieces of litter outside!"},
   {id:"dc7",title:"Learn eco-fact",emoji:"🧠",xp:10,desc:"Research one new environment fact!"},
+  {id:"dc8",title:"Unplug 3 chargers",emoji:"🔌",xp:10,desc:"Phantom power is real — unplug!"},
+  {id:"dc9",title:"Plant something",emoji:"🌱",xp:25,desc:"Plant a seed, herb, or flower!"},
+  {id:"dc10",title:"Meatless meal",emoji:"🥗",xp:15,desc:"One meal with no meat today!"},
+  {id:"dc11",title:"Tell a friend",emoji:"💬",xp:15,desc:"Share an eco-fact with a friend!"},
+  {id:"dc12",title:"Sort recycling",emoji:"♻️",xp:10,desc:"Help sort the recycling at home!"},
+  {id:"dc13",title:"Read eco-news",emoji:"📰",xp:10,desc:"Read one article about the environment!"},
+  {id:"dc14",title:"Draw nature",emoji:"🎨",xp:15,desc:"Draw or paint something from nature!"},
 ];
 
 const AVATARS = ["🌱","🌍","🌊","🦁","🐢","🦋","🌺","🐝","🦊","🐧","🦉","🐬","🌸","🐳","🦎","🌈"];
@@ -281,6 +321,82 @@ const getNextRank=(xp)=>RANKS.find(r=>r.xp>xp)||RANKS[RANKS.length-1];
 
 // ═══ V3: ECO FACTS ═══
 const ECO_FACTS = ["🌳 One tree absorbs 48lbs CO2/year","🌊 Ocean makes 50%+ of oxygen","♻️ 1 ton recycled paper saves 17 trees","💡 LEDs use 75% less energy","🚰 Leaky faucet: 3,000 gal/year wasted","🌴 Rainforests = 50% of all species","🥤 Plastic bottle: 450 years to decompose","🌬️ Wind farms power millions of homes","🐝 Bees = 1 in 3 bites of food","🗑️ Average person: 4.4lbs trash/day","🐋 Oceans absorb 30% of CO2","🌡️ Earth warmed 1.1°C since 1880","🦠 Soil has more organisms than stars in galaxy","🚲 Cycling 10km saves 2.6kg CO2 vs driving"];
+
+
+// ═══ V4: TRADING CARDS ═══
+const CARDS = [
+  {id:"tc1",name:"Mighty Oak",emoji:"🌳",rarity:"common",power:3,desc:"Absorbs CO2 for centuries",cat:"plant"},
+  {id:"tc2",name:"Blue Whale",emoji:"🐋",rarity:"legendary",power:10,desc:"Largest animal ever!",cat:"animal"},
+  {id:"tc3",name:"Honey Bee",emoji:"🐝",rarity:"rare",power:7,desc:"Pollinates 75% of crops",cat:"animal"},
+  {id:"tc4",name:"Solar Panel",emoji:"☀️",rarity:"common",power:4,desc:"Harvests the sun's power",cat:"tech"},
+  {id:"tc5",name:"Coral Reef",emoji:"🪸",rarity:"rare",power:6,desc:"Ocean's rainforest",cat:"ecosystem"},
+  {id:"tc6",name:"Wind Turbine",emoji:"🌬️",rarity:"common",power:4,desc:"Clean energy giant",cat:"tech"},
+  {id:"tc7",name:"Amazon Rainforest",emoji:"🌴",rarity:"legendary",power:10,desc:"Lungs of the Earth",cat:"ecosystem"},
+  {id:"tc8",name:"Sea Turtle",emoji:"🐢",rarity:"rare",power:5,desc:"Ancient ocean traveler",cat:"animal"},
+  {id:"tc9",name:"Electric Car",emoji:"🚗",rarity:"rare",power:5,desc:"Zero tailpipe emissions",cat:"tech"},
+  {id:"tc10",name:"Polar Bear",emoji:"🐻‍❄️",rarity:"rare",power:6,desc:"Arctic ice guardian",cat:"animal"},
+  {id:"tc11",name:"Bamboo",emoji:"🎋",rarity:"common",power:3,desc:"Grows 3 feet per day!",cat:"plant"},
+  {id:"tc12",name:"Glacier",emoji:"🏔️",rarity:"legendary",power:9,desc:"Ancient frozen river",cat:"ecosystem"},
+  {id:"tc13",name:"Mushroom Network",emoji:"🍄",rarity:"rare",power:7,desc:"The wood-wide-web!",cat:"ecosystem"},
+  {id:"tc14",name:"Wolf Pack",emoji:"🐺",rarity:"rare",power:6,desc:"Ecosystem balancers",cat:"animal"},
+  {id:"tc15",name:"Mangrove",emoji:"🌿",rarity:"common",power:4,desc:"Coastal protector",cat:"plant"},
+  {id:"tc16",name:"Giant Sequoia",emoji:"🌲",rarity:"legendary",power:10,desc:"The biggest living thing!",cat:"plant"},
+  {id:"tc17",name:"Butterfly",emoji:"🦋",rarity:"common",power:3,desc:"Delicate pollinator",cat:"animal"},
+  {id:"tc18",name:"Hydroelectric Dam",emoji:"🌊",rarity:"rare",power:6,desc:"Water power!",cat:"tech"},
+  {id:"tc19",name:"Snow Leopard",emoji:"🐆",rarity:"legendary",power:9,desc:"Ghost of the mountains",cat:"animal"},
+  {id:"tc20",name:"Earthworm",emoji:"🪱",rarity:"common",power:4,desc:"Soil's best friend",cat:"animal"},
+  {id:"tc21",name:"Venus Flytrap",emoji:"🪴",rarity:"rare",power:5,desc:"Nature's bug catcher!",cat:"plant"},
+  {id:"tc22",name:"Pangolin",emoji:"🦔",rarity:"legendary",power:8,desc:"Most trafficked animal",cat:"animal"},
+  {id:"tc23",name:"Kelp Forest",emoji:"🌊",rarity:"rare",power:6,desc:"Underwater carbon sink",cat:"ecosystem"},
+  {id:"tc24",name:"Komodo Dragon",emoji:"🦎",rarity:"legendary",power:9,desc:"Living dinosaur!",cat:"animal"},
+];
+const RARITY_COLORS = {common:"#94A3B8",rare:"#3B82F6",legendary:"#F59E0B"};
+const getRandomCard=()=>CARDS[Math.floor(Math.random()*CARDS.length)];
+
+// ═══ V4: ECO MISSIONS ═══
+const MISSIONS = [
+  {id:"m1",title:"Ocean Cleanup",emoji:"🌊",desc:"Complete 3 ocean-related items",check:u=>(u.completedStories.filter(s=>["s2","s6"].includes(s)).length+u.completedLessons.filter(l=>["l6","l12"].includes(l)).length)>=3,xp:50,reward:"tc8"},
+  {id:"m2",title:"Forest Guardian",emoji:"🌳",desc:"Complete all forest content",check:u=>["s3","s14"].every(s=>u.completedStories.includes(s))&&["l11"].every(l=>u.completedLessons.includes(l)),xp:60,reward:"tc7"},
+  {id:"m3",title:"Energy Expert",emoji:"⚡",desc:"Complete all energy lessons & stories",check:u=>["s4","s8","s12"].every(s=>u.completedStories.includes(s))&&["l5","l13","l15"].every(l=>u.completedLessons.includes(l)),xp:75,reward:"tc2"},
+  {id:"m4",title:"Game Master",emoji:"🎮",desc:"Play 20 games",check:u=>(u.gamesPlayed||0)>=20,xp:50,reward:"tc12"},
+  {id:"m5",title:"Climate Scholar",emoji:"🌡️",desc:"All climate content done",check:u=>["s5","s9"].every(s=>u.completedStories.includes(s))&&["l3","l8"].every(l=>u.completedLessons.includes(l)),xp:60,reward:"tc19"},
+  {id:"m6",title:"Garden Paradise",emoji:"🌻",desc:"Collect 15+ garden items",check:u=>u.garden.length>=15,xp:50,reward:"tc16"},
+  {id:"m7",title:"Card Collector",emoji:"🃏",desc:"Collect 10 trading cards",check:u=>(u.cards||[]).length>=10,xp:40,reward:"tc24"},
+  {id:"m8",title:"Biodiversity Hero",emoji:"🦋",desc:"All biodiversity content",check:u=>["s1","s10","s13"].every(s=>u.completedStories.includes(s))&&["l7","l14"].every(l=>u.completedLessons.includes(l)),xp:75,reward:"tc22"},
+];
+
+// ═══ V4: WORLD MAP REGIONS ═══
+const WORLD_REGIONS = [
+  {id:"w1",name:"Amazon Rainforest",emoji:"🌴",continent:"South America",fact:"Produces 20% of world's oxygen",color:"#22C55E",unlock:0},
+  {id:"w2",name:"Great Barrier Reef",emoji:"🪸",continent:"Australia",fact:"Largest living structure on Earth",color:"#0EA5E9",unlock:50},
+  {id:"w3",name:"Arctic Ice Cap",emoji:"🧊",continent:"Arctic",fact:"Reflects 80% of sunlight back to space",color:"#93C5FD",unlock:100},
+  {id:"w4",name:"Sahara Desert",emoji:"🏜️",continent:"Africa",fact:"Was green 6,000 years ago!",color:"#F59E0B",unlock:200},
+  {id:"w5",name:"Congo Rainforest",emoji:"🌳",continent:"Africa",fact:"Second largest tropical forest",color:"#16A34A",unlock:300},
+  {id:"w6",name:"Galápagos Islands",emoji:"🐢",continent:"South America",fact:"Inspired Darwin's evolution theory",color:"#14B8A6",unlock:400},
+  {id:"w7",name:"Yellowstone",emoji:"🐺",continent:"North America",fact:"First national park in the world",color:"#F97316",unlock:500},
+  {id:"w8",name:"Antarctic Ice Sheet",emoji:"🐧",continent:"Antarctica",fact:"Holds 70% of Earth's fresh water",color:"#E2E8F0",unlock:700},
+  {id:"w9",name:"Borneo Rainforest",emoji:"🦧",continent:"Asia",fact:"Home to orangutans & pygmy elephants",color:"#A855F7",unlock:900},
+  {id:"w10",name:"Mariana Trench",emoji:"🌊",continent:"Pacific",fact:"Deepest point on Earth: 36,000ft",color:"#1E40AF",unlock:1200},
+];
+
+// ═══ V4: ANIMAL ENCYCLOPEDIA ═══
+const ANIMALS = [
+  {name:"Blue Whale",emoji:"🐋",status:"Endangered",fact:"Heart is the size of a small car!",hab:"Ocean",size:"100ft"},
+  {name:"Polar Bear",emoji:"🐻‍❄️",status:"Vulnerable",fact:"Can swim 60+ miles without rest",hab:"Arctic",size:"8ft"},
+  {name:"Sea Turtle",emoji:"🐢",status:"Endangered",fact:"Can live over 100 years",hab:"Ocean",size:"6ft"},
+  {name:"Orangutan",emoji:"🦧",status:"Critical",fact:"Share 97% of human DNA",hab:"Rainforest",size:"5ft"},
+  {name:"Snow Leopard",emoji:"🐆",status:"Vulnerable",fact:"Can leap 50 feet in one bound!",hab:"Mountains",size:"4ft"},
+  {name:"Pangolin",emoji:"🦔",status:"Critical",fact:"Only mammal covered in scales",hab:"Forest",size:"3ft"},
+  {name:"Axolotl",emoji:"🦎",status:"Critical",fact:"Can regrow entire limbs!",hab:"Lakes",size:"12in"},
+  {name:"Honey Bee",emoji:"🐝",status:"Declining",fact:"Visits 2,000 flowers per day",hab:"Worldwide",size:"0.5in"},
+  {name:"Wolf",emoji:"🐺",status:"Least Concern",fact:"Can hear sounds 10 miles away",hab:"Forest",size:"5ft"},
+  {name:"Elephant",emoji:"🐘",status:"Endangered",fact:"Mourns dead family members",hab:"Savanna",size:"11ft"},
+  {name:"Giant Panda",emoji:"🐼",status:"Vulnerable",fact:"Eats 38kg of bamboo daily",hab:"Mountains",size:"5ft"},
+  {name:"Coral",emoji:"🪸",status:"Declining",fact:"Actually an animal, not a plant!",hab:"Ocean",size:"Varies"},
+  {name:"Komodo Dragon",emoji:"🦎",status:"Endangered",fact:"Can eat 80% of its body weight",hab:"Islands",size:"10ft"},
+  {name:"Red Panda",emoji:"🦊",status:"Endangered",fact:"Uses tail as a blanket!",hab:"Mountains",size:"2ft"},
+];
+const STATUS_COLORS = {"Critical":"#EF4444","Endangered":"#F97316","Vulnerable":"#F59E0B","Declining":"#EAB308","Least Concern":"#22C55E"};
 
 // ═══ SMALL COMPONENTS ═══
 const XPBar = ({cur,max,color="#22C55E",h=12}) => (
@@ -378,7 +494,7 @@ const AuthScreen = ({onLogin}) => {
 };
 
 // ═══ NAV ═══
-const tabs = [{id:"home",emoji:"🏠",label:"Home"},{id:"learn",emoji:"📚",label:"Learn"},{id:"stories",emoji:"📖",label:"Stories"},{id:"games",emoji:"🎮",label:"Games"},{id:"garden",emoji:"🌻",label:"Garden"},{id:"profile",emoji:"👤",label:"Me"}];
+const tabs = [{id:"home",emoji:"🏠",label:"Home"},{id:"learn",emoji:"📚",label:"Learn"},{id:"stories",emoji:"📖",label:"Stories"},{id:"games",emoji:"🎮",label:"Games"},{id:"garden",emoji:"🌻",label:"Garden"},{id:"explore",emoji:"🗺️",label:"Explore"},{id:"profile",emoji:"👤",label:"Me"}];
 
 const Nav = ({active,setActive}) => (
   <nav style={{position:"fixed",bottom:0,left:0,right:0,zIndex:100,background:"linear-gradient(180deg,rgba(15,23,42,.92),rgba(15,23,42,.98))",backdropFilter:"blur(20px)",borderTop:"1px solid rgba(255,255,255,.06)",display:"flex",justifyContent:"space-around",padding:"5px 0 env(safe-area-inset-bottom,8px)"}}>
@@ -431,8 +547,8 @@ const Home = ({user,setPage,setUser}) => {
       <XPBar cur={xpInLevel} max={100}/>
     </Card>
 
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8,marginBottom:16}}>
-      {[{e:"📚",v:user.completedLessons.length,l:"Lessons",c:"#22C55E"},{e:"📖",v:user.completedStories.length,l:"Stories",c:"#0EA5E9"},{e:"🎮",v:user.gamesPlayed||0,l:"Games",c:"#A855F7"},{e:"🌍",v:`${user.carbonSaved.toFixed(0)}kg`,l:"CO₂",c:"#F59E0B"}].map((s,i)=>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(5,1fr)",gap:6,marginBottom:16}}>
+      {[{e:"📚",v:user.completedLessons.length,l:"Lessons",c:"#22C55E"},{e:"📖",v:user.completedStories.length,l:"Stories",c:"#0EA5E9"},{e:"🎮",v:user.gamesPlayed||0,l:"Games",c:"#A855F7"},{e:"🃏",v:(user.cards||[]).length,l:"Cards",c:"#3B82F6"},{e:"🌍",v:`${user.carbonSaved.toFixed(0)}kg`,l:"CO₂",c:"#F59E0B"}].map((s,i)=>
         <Card key={i} style={{textAlign:"center",padding:10}}>
           <div style={{fontSize:20}}>{s.e}</div>
           <div style={{fontSize:16,fontWeight:700,color:s.c}}>{s.v}</div>
@@ -803,7 +919,55 @@ const Games = ({user,setUser}) => {
     </div>;
   };
 
-  if(active==="scramble") return <WordScramble/>;
+  // V4: True/False Blitz
+  const TFBlitz=()=>{const tfs=useRef([{s:"Plastic is biodegradable",a:false},{s:"Trees produce oxygen",a:true},{s:"Coal is renewable energy",a:false},{s:"Bees pollinate 75% of crops",a:true},{s:"The ocean is freshwater",a:false},{s:"Composting reduces landfill waste",a:true},{s:"Cars produce zero emissions",a:false},{s:"LED bulbs save energy",a:true},{s:"Deforestation helps wildlife",a:false},{s:"Solar energy is renewable",a:true},{s:"Plastic takes 10 years to decompose",a:false},{s:"Glaciers hold fresh water",a:true},{s:"Recycling saves energy",a:true},{s:"Deserts have no life",a:false},{s:"Wind turbines create pollution",a:false},{s:"Fungi connect trees underground",a:true}].sort(()=>Math.random()-.5));
+    const[qi,setQi]=useState(0);const[sc,setSc]=useState(0);const[tm,setTm]=useState(25);const ov=tm<=0||qi>=tfs.current.length;const[fb,setFb]=useState(null);
+    useEffect(()=>{if(ov)return;const t=setInterval(()=>setTm(t=>t-1),1000);return()=>clearInterval(t)},[ov]);
+    const answer=(v)=>{if(fb!==null)return;const ok=v===tfs.current[qi].a;if(ok)setSc(s=>s+1);setFb(ok);setTimeout(()=>{setFb(null);setQi(q=>q+1)},500)};
+    if(ov)return<div style={{textAlign:"center",padding:30}}><div style={{fontSize:64}}>✅</div><h2 style={{color:"#F8FAFC"}}>{sc} correct!</h2>{sc>=8&&<p style={{color:"#22C55E",fontWeight:700}}>+25 XP!</p>}<Btn onClick={()=>done(sc>=8?25:10)}sz="lg"style={{marginTop:16}}>Done</Btn></div>;
+    return<div style={{padding:"16px 16px 90px"}}><button onClick={()=>setActive(null)}style={{background:"none",border:"none",color:"#64748B",fontSize:13,cursor:"pointer",fontFamily:"'Fredoka',sans-serif",marginBottom:8}}>← Back</button>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><span style={{color:"#22C55E",fontWeight:700}}>✅ {sc}</span><span style={{color:tm<=10?"#EF4444":"#F8FAFC",fontWeight:700}}>⏱ {tm}s</span></div>
+      <Card style={{textAlign:"center",padding:24,marginBottom:16,background:fb===null?"rgba(255,255,255,.04)":fb?"rgba(34,197,94,.1)":"rgba(239,68,68,.1)",border:fb===null?"1px solid rgba(255,255,255,.08)":fb?"1px solid rgba(34,197,94,.3)":"1px solid rgba(239,68,68,.3)"}}>
+        <p style={{color:"#F8FAFC",fontSize:18,margin:0,fontWeight:600}}>{tfs.current[qi].s}</p>
+      </Card>
+      <div style={{display:"flex",gap:12}}><Btn onClick={()=>answer(true)}v="primary"sz="lg"style={{flex:1,fontSize:20}}>✅ True</Btn><Btn onClick={()=>answer(false)}v="danger"sz="lg"style={{flex:1,fontSize:20}}>❌ False</Btn></div>
+    </div>;
+  };
+
+  // V4: Emoji Catcher
+  const EmojiCatcher=()=>{const targets=["🌳","🌊","☀️","🐝","🌍","🦋","💧","♻️"];const[target,setTarget]=useState(targets[0]);const[grid,setGrid]=useState([]);const[sc,setSc]=useState(0);const[tm,setTm]=useState(20);const ov=tm<=0;
+    useEffect(()=>{setTarget(targets[Math.floor(Math.random()*targets.length)])},[]);
+    useEffect(()=>{if(ov)return;const t=setInterval(()=>setTm(t=>t-1),1000);return()=>clearInterval(t)},[ov]);
+    useEffect(()=>{if(ov)return;const t=setInterval(()=>{const newGrid=Array(12).fill(null).map(()=>targets[Math.floor(Math.random()*targets.length)]);setGrid(newGrid)},1200);return()=>clearInterval(t)},[ov,target]);
+    const tap=(i)=>{if(grid[i]===target){setSc(s=>s+1);setGrid(g=>{const n=[...g];n[i]="✨";return n})}};
+    if(ov)return<div style={{textAlign:"center",padding:30}}><div style={{fontSize:64}}>🎯</div><h2 style={{color:"#F8FAFC"}}>Caught {sc}!</h2>{sc>=10&&<p style={{color:"#22C55E",fontWeight:700}}>+25 XP!</p>}<Btn onClick={()=>done(sc>=10?25:10)}sz="lg"style={{marginTop:16}}>Done</Btn></div>;
+    return<div style={{padding:"16px 16px 90px"}}><button onClick={()=>setActive(null)}style={{background:"none",border:"none",color:"#64748B",fontSize:13,cursor:"pointer",fontFamily:"'Fredoka',sans-serif",marginBottom:8}}>← Back</button>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}><span style={{color:"#22C55E",fontWeight:700}}>🎯 {sc}</span><span style={{color:"#F8FAFC",fontWeight:700}}>⏱ {tm}s</span></div>
+      <div style={{textAlign:"center",marginBottom:10,padding:8,background:"rgba(99,102,241,.1)",borderRadius:12,border:"1px solid rgba(99,102,241,.2)"}}><span style={{fontSize:12,color:"#94A3B8"}}>Find: </span><span style={{fontSize:28}}>{target}</span></div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6}}>{grid.map((e,i)=><button key={i}onClick={()=>tap(i)}style={{aspectRatio:"1",borderRadius:14,fontSize:28,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.06)",cursor:"pointer"}}>{e}</button>)}</div>
+    </div>;
+  };
+
+  // V4: Word Chain
+  const WordChain=()=>{const chains=[["Sun","Solar","Panel","Energy","Green"],["Rain","Forest","Tree","Oxygen","Life"],["Waste","Recycle","New","Product","Use"],["Ocean","Coral","Fish","Food","Health"],["Wind","Turbine","Power","Home","Light"]];
+    const[ci]=useState(()=>Math.floor(Math.random()*chains.length));const chain=chains[ci];
+    const[revealed,setRevealed]=useState([0]);const[opts,setOpts]=useState([]);const[sc,setSc]=useState(0);
+    useEffect(()=>{if(revealed.length>=chain.length)return;const next=chain[revealed.length];const fakes=["Carbon","Plastic","Smoke","Waste","Coal","Burn","Dump"].sort(()=>Math.random()-.5).slice(0,3);setOpts([next,...fakes].sort(()=>Math.random()-.5))},[revealed]);
+    const pick=(w)=>{if(w===chain[revealed.length]){setSc(s=>s+1);setRevealed(r=>[...r,r.length])}else{setRevealed(r=>[...r,r.length])}};
+    if(revealed.length>=chain.length)return<div style={{textAlign:"center",padding:30}}><div style={{fontSize:64}}>🔗</div><h2 style={{color:"#F8FAFC"}}>{sc}/{chain.length-1} links!</h2>{sc>=3&&<p style={{color:"#22C55E",fontWeight:700}}>+30 XP!</p>}<Btn onClick={()=>done(sc>=3?30:10)}sz="lg"style={{marginTop:16}}>Done</Btn></div>;
+    return<div style={{padding:"16px 16px 90px"}}><button onClick={()=>setActive(null)}style={{background:"none",border:"none",color:"#64748B",fontSize:13,cursor:"pointer",fontFamily:"'Fredoka',sans-serif",marginBottom:12}}>← Back</button>
+      <h3 style={{color:"#F8FAFC",textAlign:"center"}}>🔗 Word Chain ({revealed.length}/{chain.length})</h3>
+      <div style={{display:"flex",gap:4,justifyContent:"center",margin:"16px 0",flexWrap:"wrap"}}>{chain.map((w,i)=><div key={i}style={{padding:"6px 12px",borderRadius:10,background:revealed.includes(i)?"rgba(34,197,94,.15)":"rgba(255,255,255,.05)",border:revealed.includes(i)?"1px solid #22C55E":"1px solid rgba(255,255,255,.08)",color:revealed.includes(i)?"#4ADE80":"#475569",fontSize:13,fontWeight:600}}>{revealed.includes(i)?w:"?"}</div>)}</div>
+      {revealed.length<chain.length&&<><p style={{color:"#94A3B8",textAlign:"center",fontSize:12,marginBottom:12}}>What comes next?</p>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>{opts.map((o,i)=><button key={i}onClick={()=>pick(o)}style={{padding:"12px",borderRadius:14,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",color:"#E2E8F0",fontSize:14,cursor:"pointer",fontFamily:"'Fredoka',sans-serif"}}>{o}</button>)}</div></>}
+    </div>;
+  };
+
+  if(active==="tfblitz") return <TFBlitz/>;
+  if(active==="emoji") return <EmojiCatcher/>;
+  if(active==="chain") return <WordChain/>;
+
+    if(active==="scramble") return <WordScramble/>;
   if(active==="speed") return <SpeedQuiz/>;
   if(active==="eco") return <EcoBuilder/>;
 
@@ -816,6 +980,9 @@ const Games = ({user,setUser}) => {
     {id:"scramble",title:"Word Scramble",emoji:"📝",desc:"Unscramble eco-words!",color:"#EC4899",xp:30},
     {id:"speed",title:"Speed Quiz",emoji:"⚡",desc:"Race the clock!",color:"#F97316",xp:30},
     {id:"eco",title:"Ecosystem Builder",emoji:"🌎",desc:"Build & balance an ecosystem!",color:"#14B8A6",xp:30},
+    {id:"tfblitz",title:"True/False Blitz",emoji:"✅",desc:"Rapid true or false!",color:"#10B981",xp:25},
+    {id:"emoji",title:"Emoji Catcher",emoji:"🎯",desc:"Catch the eco emoji!",color:"#6366F1",xp:25},
+    {id:"chain",title:"Word Chain",emoji:"🔗",desc:"Connect eco-words!",color:"#DB2777",xp:30},
   ];
 
   return <div style={{padding:"0 16px 90px"}}>
@@ -890,6 +1057,74 @@ const Garden = ({user,setUser}) => {
   </div>;
 };
 
+// ═══ V4: EXPLORE PAGE ═══
+const Explore = ({user,setUser}) => {
+  const [tab,setTab] = useState("map");
+  const visitRegion=(r)=>{if((user.worldVisited||[]).includes(r.id)||user.xp<r.unlock)return;DB.update(user.username,{worldVisited:[...(user.worldVisited||[]),r.id]});DB.addXP(user.username,15);setUser(DB.get(user.username))};
+  const openPack=()=>{if(user.ecoCoins<25)return;const card=getRandomCard();const newCards=[...(user.cards||[]),card.id];DB.update(user.username,{cards:newCards,ecoCoins:user.ecoCoins-25});DB.addXP(user.username,5);setUser(DB.get(user.username));return card};
+  const [lastCard,setLastCard]=useState(null);const[showCard,setShowCard]=useState(false);
+  const claimMission=(m)=>{if((user.missions||[]).includes(m.id)||!m.check(user))return;const nc=[...(user.cards||[]),m.reward];DB.update(user.username,{missions:[...(user.missions||[]),m.id],cards:nc});DB.addXP(user.username,m.xp);setUser(DB.get(user.username))};
+  const myCards=(user.cards||[]).map(cid=>CARDS.find(c=>c.id===cid)).filter(Boolean);
+  const uniqueCards=[...new Set((user.cards||[]))].map(cid=>CARDS.find(c=>c.id===cid)).filter(Boolean);
+
+  return<div style={{padding:"0 16px 90px"}}>
+    <div style={{display:"flex",background:"rgba(255,255,255,.05)",borderRadius:14,padding:3,marginBottom:14,border:"1px solid rgba(255,255,255,.06)",overflowX:"auto"}}>
+      {[{id:"map",l:"🗺️ World"},{id:"cards",l:"🃏 Cards"},{id:"animals",l:"🐾 Animals"},{id:"missions",l:"🎯 Missions"}].map(t=><button key={t.id}onClick={()=>setTab(t.id)}style={{flex:1,padding:"8px 4px",borderRadius:11,border:"none",fontFamily:"'Fredoka',sans-serif",fontSize:11,fontWeight:600,cursor:"pointer",background:tab===t.id?"linear-gradient(135deg,#22C55E,#16A34A)":"transparent",color:tab===t.id?"#fff":"#64748B",whiteSpace:"nowrap"}}>{t.l}</button>)}
+    </div>
+
+    {tab==="map"&&<>
+      <h2 style={{color:"#F8FAFC",fontSize:18,margin:"0 0 4px"}}>World Map 🗺️</h2>
+      <p style={{color:"#94A3B8",fontSize:11,marginBottom:14}}>Unlock regions with XP! ({(user.worldVisited||[]).length}/{WORLD_REGIONS.length} visited)</p>
+      {WORLD_REGIONS.map(r=>{const visited=(user.worldVisited||[]).includes(r.id);const locked=user.xp<r.unlock;
+        return<Card key={r.id}onClick={()=>!locked&&visitRegion(r)}style={{display:"flex",alignItems:"center",gap:12,padding:14,marginBottom:8,opacity:locked?.4:1,cursor:locked?"not-allowed":"pointer",border:visited?`1px solid ${r.color}40`:"1px solid rgba(255,255,255,.06)",background:visited?`${r.color}10`:"transparent"}}>
+          <span style={{fontSize:28}}>{locked?"🔒":r.emoji}</span>
+          <div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:visited?"#F8FAFC":"#94A3B8"}}>{r.name}</div><div style={{fontSize:10,color:"#64748B"}}>{r.continent}</div>{visited&&<div style={{fontSize:10,color:r.color,marginTop:2}}>{r.fact}</div>}</div>
+          {locked?<span style={{fontSize:10,color:"#64748B"}}>{r.unlock}XP</span>:visited?<span style={{color:"#22C55E"}}>✅</span>:<span style={{color:"#F59E0B",fontSize:11}}>+15XP</span>}
+        </Card>})}
+    </>}
+
+    {tab==="cards"&&<>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+        <div><h2 style={{color:"#F8FAFC",fontSize:18,margin:0}}>Trading Cards 🃏</h2><p style={{color:"#94A3B8",fontSize:11}}>{uniqueCards.length}/{CARDS.length} unique</p></div>
+        <Btn onClick={()=>{const c=openPack();if(c){setLastCard(c);setShowCard(true)}}}v="gold"sz="sm"disabled={user.ecoCoins<25}>🎁 Open Pack (🪙25)</Btn>
+      </div>
+      <Modal open={showCard}onClose={()=>setShowCard(false)}title="New Card!">
+        {lastCard&&<div style={{textAlign:"center",padding:16}}><div style={{fontSize:64,marginBottom:8}}>{lastCard.emoji}</div><h3 style={{color:"#F8FAFC",margin:"0 0 4px"}}>{lastCard.name}</h3><div style={{display:"inline-block",padding:"2px 10px",borderRadius:8,background:RARITY_COLORS[lastCard.rarity]+"20",color:RARITY_COLORS[lastCard.rarity],fontSize:11,fontWeight:700,textTransform:"uppercase"}}>{lastCard.rarity}</div><p style={{color:"#94A3B8",fontSize:12,marginTop:8}}>{lastCard.desc}</p><div style={{color:"#F59E0B",fontSize:14,fontWeight:700,marginTop:4}}>Power: {"⭐".repeat(Math.ceil(lastCard.power/2))}</div></div>}
+      </Modal>
+      {uniqueCards.length===0?<Card style={{textAlign:"center",padding:30}}><div style={{fontSize:40}}>🎁</div><p style={{color:"#94A3B8"}}>Open packs to collect cards!</p></Card>
+      :<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>{uniqueCards.map(c=><Card key={c.id}style={{textAlign:"center",padding:10,border:`1px solid ${RARITY_COLORS[c.rarity]}30`,background:`${RARITY_COLORS[c.rarity]}08`}}>
+        <div style={{fontSize:28}}>{c.emoji}</div><div style={{fontSize:9,fontWeight:700,color:"#F8FAFC"}}>{c.name}</div>
+        <div style={{fontSize:8,color:RARITY_COLORS[c.rarity],fontWeight:600}}>{c.rarity}</div>
+        <div style={{fontSize:8,color:"#F59E0B"}}>{"⭐".repeat(Math.ceil(c.power/2))}</div>
+      </Card>)}</div>}
+    </>}
+
+    {tab==="animals"&&<>
+      <h2 style={{color:"#F8FAFC",fontSize:18,margin:"0 0 12px"}}>Animal Encyclopedia 🐾</h2>
+      {ANIMALS.map((a,i)=><Card key={i}style={{display:"flex",alignItems:"center",gap:12,padding:12,marginBottom:8}}>
+        <span style={{fontSize:32}}>{a.emoji}</span>
+        <div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:"#F8FAFC"}}>{a.name}</div>
+          <div style={{display:"inline-block",padding:"1px 8px",borderRadius:6,background:(STATUS_COLORS[a.status]||"#666")+"20",color:STATUS_COLORS[a.status],fontSize:9,fontWeight:600,marginBottom:3}}>{a.status}</div>
+          <div style={{fontSize:10,color:"#94A3B8"}}>{a.fact}</div>
+          <div style={{fontSize:9,color:"#64748B"}}>{a.hab} • {a.size}</div>
+        </div>
+      </Card>)}
+    </>}
+
+    {tab==="missions"&&<>
+      <h2 style={{color:"#F8FAFC",fontSize:18,margin:"0 0 4px"}}>Eco Missions 🎯</h2>
+      <p style={{color:"#94A3B8",fontSize:11,marginBottom:14}}>Complete missions for rare cards!</p>
+      {MISSIONS.map(m=>{const done=(user.missions||[]).includes(m.id);const ready=m.check(user)&&!done;const card=CARDS.find(c=>c.id===m.reward);
+        return<Card key={m.id}style={{display:"flex",alignItems:"center",gap:12,padding:14,marginBottom:8,opacity:done?.5:1,border:ready?"1px solid rgba(34,197,94,.3)":"1px solid rgba(255,255,255,.06)",background:ready?"rgba(34,197,94,.05)":"transparent"}}>
+          <span style={{fontSize:28}}>{done?"✅":m.emoji}</span>
+          <div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:"#F8FAFC"}}>{m.title}</div><div style={{fontSize:10,color:"#94A3B8"}}>{m.desc}</div><div style={{fontSize:10,color:"#F59E0B",marginTop:2}}>+{m.xp}XP + {card?card.emoji:""} {card?card.name:""} card</div></div>
+          {ready&&!done&&<Btn onClick={()=>claimMission(m)}v="primary"sz="sm">Claim!</Btn>}
+          {done&&<span style={{color:"#22C55E",fontSize:12}}>Done</span>}
+        </Card>})}
+    </>}
+  </div>;
+};
+
 // ═══ PROFILE ═══
 const Profile = ({user,setUser,onLogout}) => {
   const earned = ACHIEVEMENTS.filter(a=>a.check(user));
@@ -947,7 +1182,7 @@ export default function App() {
 
   if (!user) return <AuthScreen onLogin={u=>setUser(u)}/>;
 
-  const pages = {home:<Home user={user} setPage={setPage} setUser={setUser}/>,learn:<Learn user={user} setUser={setUser}/>,stories:<Stories user={user} setUser={setUser}/>,games:<Games user={user} setUser={setUser}/>,garden:<Garden user={user} setUser={setUser}/>,profile:<Profile user={user} setUser={setUser} onLogout={()=>{setUser(null);setPage("home")}}/>};
+  const pages = {home:<Home user={user} setPage={setPage} setUser={setUser}/>,learn:<Learn user={user} setUser={setUser}/>,stories:<Stories user={user} setUser={setUser}/>,games:<Games user={user} setUser={setUser}/>,garden:<Garden user={user} setUser={setUser}/>,explore:<Explore user={user} setUser={setUser}/>,profile:<Profile user={user} setUser={setUser} onLogout={()=>{setUser(null);setPage("home")}}/>};
 
   return (
     <div style={{minHeight:"100vh",background:"linear-gradient(145deg,#0F172A 0%,#1E1B4B 50%,#0F172A 100%)",fontFamily:"'Fredoka',sans-serif",color:"#F8FAFC",maxWidth:480,margin:"0 auto",position:"relative",overflow:"hidden"}}>
