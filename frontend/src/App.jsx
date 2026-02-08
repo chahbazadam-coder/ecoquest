@@ -13,7 +13,7 @@ const DB = {
   users: {},
   createUser(u, p, av) {
     if (this.users[u]) return null;
-    const user = { id: Date.now().toString(36), username: u, password: p, avatar: av || "🌱", level: 1, xp: 0, streak: 1, completedLessons: [], completedStories: [], achievements: [], ecoCoins: 50, garden: [], carbonSaved: 0, joinDate: new Date().toISOString() };
+    const user = { id: Date.now().toString(36), username: u, password: p, avatar: av || "🌱", level: 1, xp: 0, streak: 1, completedLessons: [], completedStories: [], completedChallenges: [], achievements: [], ecoCoins: 50, garden: [], carbonSaved: 0, gamesPlayed: 0, joinDate: new Date().toISOString() };
     this.users[u] = user;
     return { ...user };
   },
@@ -92,9 +92,19 @@ const STORIES = [
       {q:"Which is clean energy?", opts:["Coal","Oil","Solar panels","Gasoline"], ans:2},
       {q:"Three clean energy sources:", opts:["Coal,oil,gas","Solar,wind,water","Fire,smoke,steam","Paper,wood,plastic"], ans:1},
     ]},
+  {id:"s5",title:"Naya and the Melting Mountain",emoji:"🏔️",xp:40,cat:"climate",color:"#818CF8",
+    pages:[{t:"Naya lived at the foot of Mount Glacia — crowned with ancient ice.",img:"🏔️🏘️❄️"},{t:"Every summer, glacier meltwater filled the streams. Life depended on it.",img:"💧🌊🏡"},{t:"But this year streams ran dry. The glacier was shrinking — fast.",img:"☀️🏔️😰"},{t:"\"The world is warming,\" said her teacher. \"Glaciers melt everywhere.\"",img:"🌍🌡️📚"},{t:"Naya started a climate club. Kids worldwide joined as Glacier Guardians!",img:"👧👦🌍✊"},{t:"Their movement gave the mountain a fighting chance.",img:"🏔️💚🕊️"}],
+    quiz:[{q:"Why was glacier shrinking?",opts:["Earthquake","Global warming","Animals","Wind"],ans:1},{q:"Glaciers provide:",opts:["Gold","Fresh water","Electricity","Nothing"],ans:1},{q:"Naya started:",opts:["Nothing","Climate movement","Restaurant","Bank"],ans:1}]},
+  {id:"s6",title:"The Plastic Island Mystery",emoji:"🏝️",xp:40,cat:"ocean",color:"#F472B6",
+    pages:[{t:"Sailor Sam found an island not on any map — made entirely of trash!",img:"⛵🏝️🗑️"},{t:"The Great Pacific Garbage Patch — twice the size of Texas!",img:"🧴🥤📦"},{t:"Turtles trapped in rings. Birds tangled in plastic. A crisis!",img:"🐟🐦🐢"},{t:"Sam told everyone. Schools banned single-use plastic!",img:"🏫📄💪"},{t:"The island stopped growing. Every piece of plastic saved a life.",img:"🌊💚🐢"}],
+    quiz:[{q:"Island made of:",opts:["Sand","Plastic trash","Coral","Seaweed"],ans:1},{q:"Garbage patch size:",opts:["Tiny","2x Texas","1 field","1 mile"],ans:1},{q:"Stop it by:",opts:["More plastic","Reduce single-use","Ignore","Burn"],ans:1}]},
+  {id:"s7",title:"The Seed Vault Keepers",emoji:"🌾",xp:45,cat:"biodiversity",color:"#A3E635",
+    pages:[{t:"In an Arctic mountain lies the Seed Vault — Earth's food backup!",img:"🏔️❄️🌱"},{t:"Seeds from every food plant. Millions of varieties protected!",img:"🌾🍅🌽"},{t:"75% of food plant varieties are lost forever. Diversity = survival.",img:"📉😢🌱"},{t:"Twins Aya and Zara grew rare heritage veggies at school.",img:"🥕🍅🏫"},{t:"Kids worldwide joined. Forgotten foods saved, one seed at a time!",img:"🌍👧👦🌻"}],
+    quiz:[{q:"Vault stores:",opts:["Money","Food plant seeds","Ice cream","Animals"],ans:1},{q:"Diversity matters for:",opts:["Looks","Disease resistance","Fun","Nothing"],ans:1},{q:"Variety lost:",opts:["0%","25%","75%","100%"],ans:2}]},
+  {id:"s8",title:"Zephyr the Wind Turbine",emoji:"🌬️",xp:45,cat:"energy",color:"#06B6D4",
+    pages:[{t:"Zephyr the new turbine spun her blades — 500 homes lit up!",img:"🌬️💡✨"},{t:"No smoke, no pollution. Clean energy from the wind!",img:"🏠🏠💚"},{t:"The old coal plant got quieter as families chose wind power.",img:"🏭📉🌬️"},{t:"It shut down for good. Bluer sky, cleaner air, happy kids!",img:"☀️👧💙"}],
+    quiz:[{q:"One turbine powers:",opts:["5","50","500","5000"],ans:2},{q:"Coal plant:",opts:["Grew","Shut down","Moved","Nothing"],ans:1},{q:"Wind advantage:",opts:["Expensive","No pollution","Loud","Ugly"],ans:1}]},
 ];
-
-const LESSONS = [
   { id:"l1", title:"What is Recycling?", emoji:"♻️", cat:"waste", xp:20, color:"#22C55E",
     content:"Recycling means turning old things into new things! A plastic bottle can become a toy, bench, or t-shirt!",
     qs:[
@@ -142,6 +152,18 @@ const LESSONS = [
       {q:"Plastic takes 400+ years to decompose", type:"tf", ans:true},
       {q:"Reduce plastic by:", opts:["Use more","Reusable bags/bottles","Throw in river","Ignore"], ans:1},
     ]},
+  {id:"l7",title:"Endangered Animals",emoji:"🐼",cat:"biodiversity",xp:35,color:"#EC4899",
+    content:"Over 40,000 species face extinction! Habitat loss, pollution, and climate change are the main causes. Losing one species affects the whole ecosystem — like removing a piece from a puzzle.",
+    qs:[{q:"Main cause of endangerment?",opts:["Zoos","Habitat loss","Fighting","Cold"],ans:1},{q:"Threatened species:",opts:["100","1,000","40,000+","10"],ans:2},{q:"Pandas are endangered",type:"tf",ans:true},{q:"Losing one species affects:",opts:["Nothing","Whole ecosystem","Just that animal","Only zoos"],ans:1}]},
+  {id:"l8",title:"Carbon Footprint",emoji:"👣",cat:"climate",xp:35,color:"#8B5CF6",
+    content:"Your carbon footprint = total CO2 from your activities. Driving = ~4.6 tons/year. A burger = ~3kg CO2! Flying NY→London = 1 ton. Small changes: walk more, eat local, reduce waste.",
+    qs:[{q:"Carbon footprint measures:",opts:["Shoe size","Your CO2 output","Walking distance","Paper use"],ans:1},{q:"Biggest footprint?",opts:["Walking","Cycling","Driving","Reading"],ans:2},{q:"A burger = ~3kg CO2",type:"tf",ans:true},{q:"Reduce by:",opts:["Drive more","Fly lots","Eat local, walk more","Buy more"],ans:2}]},
+  {id:"l9",title:"Fast Fashion",emoji:"👕",cat:"waste",xp:35,color:"#F97316",
+    content:"Fashion = 10% of global CO2! One t-shirt uses 2,700 liters of water — what you'd drink in 2.5 years! Buying secondhand and wearing clothes longer makes a huge difference.",
+    qs:[{q:"Fashion's CO2 share:",opts:["0.1%","10%","50%","90%"],ans:1},{q:"Water per t-shirt:",opts:["1L","100L","2,700L","1M L"],ans:2},{q:"Fast fashion is sustainable",type:"tf",ans:false},{q:"Better choice:",opts:["Buy new weekly","Secondhand/thrift","Throw away","Hoard"],ans:1}]},
+  {id:"l10",title:"Food Waste",emoji:"🍕",cat:"waste",xp:35,color:"#14B8A6",
+    content:"1/3 of all food produced is wasted — 1.3 billion tons/year! If food waste were a country, it'd be the 3rd largest CO2 emitter! Plan meals, eat leftovers, compost scraps.",
+    qs:[{q:"Food wasted:",opts:["1%","10%","About 1/3","All"],ans:2},{q:"Food waste CO2 ranking:",opts:["Last","10th","3rd","1st"],ans:2},{q:"Leftovers should be trashed",type:"tf",ans:false},{q:"Reduce by:",opts:["Cook excess","Plan & eat leftovers","Only candy","Skip meals"],ans:1}]},
 ];
 
 const GARDEN_SHOP = [
@@ -151,6 +173,9 @@ const GARDEN_SHOP = [
   {id:"p7",name:"Tulip",emoji:"🌷",cost:20,type:"flower"},{id:"p8",name:"Cherry",emoji:"🌸",cost:40,type:"tree"},
   {id:"p9",name:"Butterfly",emoji:"🦋",cost:35,type:"creature"},{id:"p10",name:"Ladybug",emoji:"🐞",cost:30,type:"creature"},
   {id:"p11",name:"Frog",emoji:"🐸",cost:45,type:"creature"},{id:"p12",name:"Bee Hive",emoji:"🐝",cost:55,type:"creature"},
+  {id:"p13",name:"Pond",emoji:"🪷",cost:70,type:"feature"},{id:"p14",name:"Bird House",emoji:"🏠",cost:40,type:"feature"},
+  {id:"p15",name:"Hedge",emoji:"🌿",cost:30,type:"plant"},{id:"p16",name:"Deer",emoji:"🦌",cost:80,type:"creature"},
+  {id:"p17",name:"Owl",emoji:"🦉",cost:65,type:"creature"},{id:"p18",name:"Rabbit",emoji:"🐇",cost:35,type:"creature"},
 ];
 
 const TIPS = [
@@ -158,19 +183,38 @@ const TIPS = [
   "🚶 Walking to school saves ~1kg CO2!","🌱 One tree absorbs 22kg CO2/year!",
   "♻️ Recycling 1 can = 3 hours of TV energy!","🐝 1/3 of food depends on bees!",
   "📦 Reusing a bag 5x cuts impact by 80%!","🍎 Local food = less transport pollution!",
+  "👕 Buying secondhand saves 6kg CO2 per item!","🥤 1 reusable bottle replaces 167 plastic ones/year!",
+  "🚲 Cycling 10km saves 2.6kg CO2 vs driving!","🌍 Earth has warmed 1.1°C since 1880!",
+  "🪱 Composting reduces landfill waste by 30%!","🐋 Oceans absorb 30% of human CO2!",
 ];
 
-const AVATARS = ["🌱","🌍","🌊","🦁","🐢","🦋","🌺","🐝","🦊","🐧","🦉","🐬"];
+const DAILY_CHALLENGES = [
+  {id:"dc1",title:"Turn off 3 lights",emoji:"💡",xp:10,desc:"Find lights left on and turn them off!"},
+  {id:"dc2",title:"Reusable bottle day",emoji:"🧴",xp:10,desc:"Skip plastic — use reusable all day!"},
+  {id:"dc3",title:"Walk don't drive",emoji:"🚶",xp:15,desc:"Walk or bike somewhere you'd normally drive!"},
+  {id:"dc4",title:"Zero food waste",emoji:"🍽️",xp:15,desc:"Eat everything — no waste today!"},
+  {id:"dc5",title:"5-min shower",emoji:"🚿",xp:10,desc:"Time your shower — under 5 minutes!"},
+  {id:"dc6",title:"Pick up litter",emoji:"🗑️",xp:20,desc:"Pick up 5 pieces of litter outside!"},
+  {id:"dc7",title:"Learn eco-fact",emoji:"🧠",xp:10,desc:"Research one new environment fact!"},
+];
+
+const AVATARS = ["🌱","🌍","🌊","🦁","🐢","🦋","🌺","🐝","🦊","🐧","🦉","🐬","🌸","🐳","🦎","🌈"];
 
 const ACHIEVEMENTS = [
   {id:"a1",title:"First Steps",emoji:"👣",desc:"Complete 1 lesson",check:u=>u.completedLessons.length>=1},
   {id:"a2",title:"Story Lover",emoji:"📚",desc:"Read 1 story",check:u=>u.completedStories.length>=1},
   {id:"a3",title:"Eco Warrior",emoji:"🛡️",desc:"Reach Level 3",check:u=>u.level>=3},
-  {id:"a4",title:"Knowledge",emoji:"🧠",desc:"Complete 3 lessons",check:u=>u.completedLessons.length>=3},
+  {id:"a4",title:"Knowledge",emoji:"🧠",desc:"Complete 5 lessons",check:u=>u.completedLessons.length>=5},
   {id:"a5",title:"Green Thumb",emoji:"🌿",desc:"Plant 3 items",check:u=>u.garden.length>=3},
   {id:"a6",title:"Protector",emoji:"🌍",desc:"Earn 200 XP",check:u=>u.xp>=200},
   {id:"a7",title:"All Stories",emoji:"📖",desc:"Read all stories",check:u=>u.completedStories.length>=STORIES.length},
-  {id:"a8",title:"Master",emoji:"👑",desc:"Complete all lessons",check:u=>u.completedLessons.length>=LESSONS.length},
+  {id:"a8",title:"Master",emoji:"👑",desc:"All lessons",check:u=>u.completedLessons.length>=LESSONS.length},
+  {id:"a9",title:"Game King",emoji:"🎮",desc:"Play 10 games",check:u=>(u.gamesPlayed||0)>=10},
+  {id:"a10",title:"Carbon Hero",emoji:"💚",desc:"Save 100kg CO2",check:u=>u.carbonSaved>=100},
+  {id:"a11",title:"Rich!",emoji:"💰",desc:"Earn 500 coins",check:u=>u.ecoCoins>=500},
+  {id:"a12",title:"Gardener",emoji:"🏡",desc:"Plant 10 items",check:u=>u.garden.length>=10},
+  {id:"a13",title:"Legend",emoji:"⭐",desc:"Reach Level 10",check:u=>u.level>=10},
+  {id:"a14",title:"Challenger",emoji:"🎯",desc:"5 challenges done",check:u=>(u.completedChallenges||[]).length>=5},
 ];
 
 // ═══ SMALL COMPONENTS ═══
@@ -182,7 +226,7 @@ const XPBar = ({cur,max,color="#22C55E",h=12}) => (
 );
 
 const Btn = ({children,onClick,v="primary",sz="md",disabled,style:sx,...p}) => {
-  const bg = {primary:"linear-gradient(135deg,#22C55E,#16A34A)",secondary:"rgba(255,255,255,0.1)",danger:"linear-gradient(135deg,#EF4444,#DC2626)",gold:"linear-gradient(135deg,#F59E0B,#D97706)",ghost:"transparent"}[v];
+  const bg = {primary:"linear-gradient(135deg,#22C55E,#16A34A)",secondary:"rgba(255,255,255,0.1)",danger:"linear-gradient(135deg,#EF4444,#DC2626)",gold:"linear-gradient(135deg,#F59E0B,#D97706)",ghost:"transparent",purple:"linear-gradient(135deg,#8B5CF6,#7C3AED)"}[v];
   const pd = {sm:"8px 16px",md:"12px 24px",lg:"16px 32px"}[sz];
   const fs = {sm:13,md:15,lg:17}[sz];
   return <button onClick={disabled?undefined:onClick} {...p} style={{padding:pd,fontSize:fs,background:bg,color:v==="ghost"?"#94A3B8":"#fff",border:v==="secondary"?"2px solid rgba(255,255,255,.2)":v==="ghost"?"2px solid #334155":"none",borderRadius:14,fontFamily:"'Fredoka',sans-serif",fontWeight:600,cursor:disabled?"not-allowed":"pointer",opacity:disabled?.5:1,transition:"all .2s",boxShadow:v==="primary"?"0 4px 14px #22C55E44":"none",letterSpacing:.5,...sx}}>{children}</button>;
@@ -303,8 +347,11 @@ const Header = ({user}) => (
 );
 
 // ═══ HOME DASHBOARD ═══
-const Home = ({user,setPage}) => {
+const Home = ({user,setPage,setUser}) => {
   const tip = TIPS[new Date().getDate()%TIPS.length];
+  const dc = DAILY_CHALLENGES[new Date().getDay()%DAILY_CHALLENGES.length];
+  const dcDone = (user.completedChallenges||[]).includes(dc.id);
+  const doDC = () => { if(dcDone)return; DB.addXP(user.username,dc.xp); DB.update(user.username,{completedChallenges:[...(user.completedChallenges||[]),dc.id]}); setUser(DB.get(user.username)); };
   const xpInLevel = user.xp % 100;
 
   return <div style={{padding:"0 16px 90px"}}>
@@ -318,15 +365,20 @@ const Home = ({user,setPage}) => {
       <XPBar cur={xpInLevel} max={100}/>
     </Card>
 
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:16}}>
-      {[{e:"📚",v:user.completedLessons.length,l:"Lessons",c:"#22C55E"},{e:"📖",v:user.completedStories.length,l:"Stories",c:"#0EA5E9"},{e:"🌍",v:`${user.carbonSaved.toFixed(0)}kg`,l:"CO₂ Saved",c:"#A855F7"}].map((s,i)=>
-        <Card key={i} style={{textAlign:"center",padding:12}}>
-          <div style={{fontSize:22}}>{s.e}</div>
-          <div style={{fontSize:18,fontWeight:700,color:s.c}}>{s.v}</div>
-          <div style={{fontSize:9,color:"#64748B",fontWeight:600}}>{s.l}</div>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8,marginBottom:16}}>
+      {[{e:"📚",v:user.completedLessons.length,l:"Lessons",c:"#22C55E"},{e:"📖",v:user.completedStories.length,l:"Stories",c:"#0EA5E9"},{e:"🎮",v:user.gamesPlayed||0,l:"Games",c:"#A855F7"},{e:"🌍",v:`${user.carbonSaved.toFixed(0)}kg`,l:"CO₂",c:"#F59E0B"}].map((s,i)=>
+        <Card key={i} style={{textAlign:"center",padding:10}}>
+          <div style={{fontSize:20}}>{s.e}</div>
+          <div style={{fontSize:16,fontWeight:700,color:s.c}}>{s.v}</div>
+          <div style={{fontSize:8,color:"#64748B"}}>{s.l}</div>
         </Card>
       )}
     </div>
+
+    <Card style={{marginBottom:16,background:dcDone?"rgba(34,197,94,.08)":"linear-gradient(135deg,rgba(139,92,246,.12),rgba(139,92,246,.05))",border:dcDone?"1px solid rgba(34,197,94,.2)":"1px solid rgba(139,92,246,.15)"}}>
+      <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,fontWeight:700,color:dcDone?"#22C55E":"#A78BFA"}}>🎯 DAILY CHALLENGE</span><span style={{fontSize:11,color:"#22C55E"}}>+{dc.xp}XP</span></div>
+      <div style={{display:"flex",alignItems:"center",gap:10,marginTop:6}}><span style={{fontSize:26}}>{dc.emoji}</span><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:"#F8FAFC"}}>{dc.title}</div><div style={{fontSize:10,color:"#94A3B8"}}>{dc.desc}</div></div><Btn onClick={doDC} v={dcDone?"ghost":"purple"} sz="sm" disabled={dcDone}>{dcDone?"✅":"Done!"}</Btn></div>
+    </Card>
 
     <Card style={{marginBottom:16,background:"linear-gradient(135deg,rgba(59,130,246,.08),rgba(139,92,246,.08))",border:"1px solid rgba(99,102,241,.12)"}}>
       <div style={{fontSize:11,fontWeight:700,color:"#818CF8",marginBottom:4}}>🌟 ECO TIP</div>
@@ -601,19 +653,47 @@ const WaterDrop = ({onDone,onBack}) => {
 
 const Games = ({user,setUser}) => {
   const [active,setActive] = useState(null);
-  const done = (xp) => { if(xp>0){DB.addXP(user.username,xp);setUser(DB.get(user.username));} setActive(null); };
+  const done = (xp) => { if(xp>0){DB.addXP(user.username,xp);}DB.update(user.username,{gamesPlayed:(user.gamesPlayed||0)+1});setUser(DB.get(user.username));setActive(null); };
+
+  // Memory Match
+  const MemoryMatch=()=>{const pairs=["🌳","🌊","☀️","🐝","♻️","🌍","🦋","💧"];const[cards]=useState(()=>[...pairs,...pairs].map((e,i)=>({id:i,emoji:e})).sort(()=>Math.random()-.5));const[fl,setFl]=useState([]);const[mt,setMt]=useState([]);const[mv,setMv]=useState(0);const isDone=mt.length===16;
+    useEffect(()=>{if(fl.length===2){setMv(m=>m+1);const[a,b]=fl;if(cards[a].emoji===cards[b].emoji){setMt(m=>[...m,a,b]);setFl([]);}else setTimeout(()=>setFl([]),800);}},[fl]);
+    if(isDone)return<div style={{textAlign:"center",padding:30}}><div style={{fontSize:64}}>🧠</div><h2 style={{color:"#F8FAFC"}}>Matched in {mv} moves!</h2>{mv<=16&&<p style={{color:"#22C55E",fontWeight:700}}>+25 XP!</p>}<Btn onClick={()=>done(mv<=16?25:10)}sz="lg"style={{marginTop:16}}>Done</Btn></div>;
+    return<div style={{padding:"16px 16px 90px"}}><button onClick={()=>setActive(null)}style={{background:"none",border:"none",color:"#64748B",fontSize:13,cursor:"pointer",fontFamily:"'Fredoka',sans-serif",marginBottom:12}}>← Back</button><div style={{display:"flex",justifyContent:"space-between",marginBottom:12}}><h3 style={{color:"#F8FAFC",margin:0}}>🧠 Memory</h3><span style={{color:"#94A3B8",fontSize:13}}>Moves: {mv}</span></div><div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:8}}>{cards.map((c,i)=>{const sh=fl.includes(i)||mt.includes(i);return<button key={i}onClick={()=>{if(fl.length<2&&!fl.includes(i)&&!mt.includes(i))setFl(f=>[...f,i])}}style={{aspectRatio:"1",borderRadius:14,fontSize:sh?28:20,display:"flex",alignItems:"center",justifyContent:"center",border:mt.includes(i)?"2px solid #22C55E":"1px solid rgba(255,255,255,.1)",background:mt.includes(i)?"rgba(34,197,94,.15)":sh?"rgba(99,102,241,.15)":"rgba(255,255,255,.05)",cursor:"pointer",transition:"all .3s"}}>{sh?c.emoji:"❓"}</button>})}</div></div>;
+  };
+
+  // Carbon Calculator
+  const CarbonCalc=()=>{const[step,setStep]=useState(0);const[ans,setAns]=useState({});const qs=[{q:"Get to school?",opts:[{l:"🚶 Walk",v:0},{l:"🚌 Bus",v:2},{l:"🚗 Car",v:5}]},{q:"Eat meat?",opts:[{l:"🥗 Never",v:0},{l:"🍗 Sometimes",v:3},{l:"🥩 Daily",v:6}]},{q:"Recycle?",opts:[{l:"♻️ Everything",v:0},{l:"📦 Most",v:2},{l:"❌ No",v:5}]},{q:"Shower?",opts:[{l:"⚡ 3min",v:0},{l:"🚿 5min",v:1},{l:"🛁 15+",v:5}]}];
+    if(step>=qs.length){const total=Object.values(ans).reduce((a,b)=>a+b,0);const pct=Math.round((1-total/(qs.length*6))*100);return<div style={{textAlign:"center",padding:30}}><div style={{fontSize:56}}>{pct>=70?"🏆":"🌱"}</div><h2 style={{color:"#F8FAFC"}}>Eco-score: {pct}%</h2><div style={{margin:"12px auto",maxWidth:200}}><XPBar cur={pct}max={100}color={pct>=60?"#22C55E":"#F59E0B"}h={16}/></div><Btn onClick={()=>done(pct>=60?25:10)}sz="lg"style={{marginTop:16}}>Done</Btn></div>;}
+    return<div style={{padding:"16px 16px 90px"}}><button onClick={()=>setActive(null)}style={{background:"none",border:"none",color:"#64748B",fontSize:13,cursor:"pointer",fontFamily:"'Fredoka',sans-serif",marginBottom:12}}>← Back</button><h3 style={{color:"#F8FAFC",textAlign:"center"}}>👣 Carbon Calculator ({step+1}/{qs.length})</h3><XPBar cur={step}max={qs.length}color="#8B5CF6"h={6}/><h3 style={{color:"#F8FAFC",fontSize:18,margin:"20px 0 16px",textAlign:"center"}}>{qs[step].q}</h3><div style={{display:"flex",flexDirection:"column",gap:10}}>{qs[step].opts.map((o,i)=><button key={i}onClick={()=>{setAns({...ans,[step]:o.v});setStep(step+1)}}style={{padding:"14px",borderRadius:14,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",color:"#E2E8F0",fontSize:15,cursor:"pointer",fontFamily:"'Fredoka',sans-serif"}}>{o.l}</button>)}</div></div>;
+  };
+
+  // Pollution Fighter
+  const PollutionFighter=()=>{const[sc,setSc]=useState(0);const[tm,setTm]=useState(20);const[grid,setGrid]=useState(Array(9).fill(null));const ov=tm<=0;const bads=["🏭","💨","🛢️","🚗"];const gds=["🌳","🌸","🐝"];
+    useEffect(()=>{if(ov)return;const t=setInterval(()=>setTm(t=>t-1),1000);return()=>clearInterval(t)},[ov]);
+    useEffect(()=>{if(ov)return;const t=setInterval(()=>{setGrid(g=>{const n=[...g];n[Math.floor(Math.random()*9)]=Math.random()>.3?bads[Math.floor(Math.random()*bads.length)]:gds[Math.floor(Math.random()*gds.length)];return n})},900);return()=>clearInterval(t)},[ov]);
+    const tap=i=>{if(!grid[i]||grid[i]==="💥"||grid[i]==="😢")return;if(bads.includes(grid[i])){setSc(s=>s+1);setGrid(g=>{const n=[...g];n[i]="💥";setTimeout(()=>setGrid(gg=>{const nn=[...gg];nn[i]=null;return nn}),300);return n})}else{setSc(s=>Math.max(0,s-1));setGrid(g=>{const n=[...g];n[i]="😢";setTimeout(()=>setGrid(gg=>{const nn=[...gg];nn[i]=null;return nn}),300);return n})}};
+    if(ov)return<div style={{textAlign:"center",padding:30}}><div style={{fontSize:64}}>⚔️</div><h2 style={{color:"#F8FAFC"}}>Beat {sc} polluters!</h2>{sc>=10&&<p style={{color:"#22C55E",fontWeight:700}}>+25 XP!</p>}<Btn onClick={()=>done(sc>=10?25:10)}sz="lg"style={{marginTop:16}}>Done</Btn></div>;
+    return<div style={{padding:"16px 16px 90px"}}><button onClick={()=>setActive(null)}style={{background:"none",border:"none",color:"#64748B",fontSize:13,cursor:"pointer",fontFamily:"'Fredoka',sans-serif",marginBottom:8}}>← Back</button><div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}><span style={{color:"#EF4444",fontWeight:700}}>⚔️ {sc}</span><span style={{color:"#F8FAFC",fontWeight:700}}>⏱ {tm}s</span></div><p style={{color:"#94A3B8",fontSize:10,textAlign:"center",marginBottom:6}}>Tap 🏭💨 — don't tap 🌳🐝!</p><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>{grid.map((c,i)=><button key={i}onClick={()=>tap(i)}style={{aspectRatio:"1",borderRadius:16,fontSize:c?36:20,display:"flex",alignItems:"center",justifyContent:"center",background:c?"rgba(255,255,255,.06)":"rgba(255,255,255,.02)",border:"1px solid rgba(255,255,255,.08)",cursor:c?"pointer":"default"}}>{c||""}</button>)}</div></div>;
+  };
 
   if(active==="sort") return <EcoSorter onDone={done} onBack={()=>setActive(null)}/>;
   if(active==="water") return <WaterDrop onDone={done} onBack={()=>setActive(null)}/>;
+  if(active==="memory") return <MemoryMatch/>;
+  if(active==="carbon") return <CarbonCalc/>;
+  if(active==="fight") return <PollutionFighter/>;
 
   const games = [
-    {id:"sort",title:"Eco Sorter",emoji:"🗑️",desc:"Sort waste into the right bins!",color:"#22C55E",xp:15},
-    {id:"water",title:"Water Drop Quest",emoji:"💧",desc:"Catch falling water drops!",color:"#0EA5E9",xp:15},
+    {id:"sort",title:"Eco Sorter",emoji:"🗑️",desc:"Sort waste into bins!",color:"#22C55E",xp:20},
+    {id:"water",title:"Water Drop Quest",emoji:"💧",desc:"Catch falling drops!",color:"#0EA5E9",xp:20},
+    {id:"memory",title:"Eco Memory Match",emoji:"🧠",desc:"Match eco-symbol pairs!",color:"#8B5CF6",xp:25},
+    {id:"carbon",title:"Carbon Calculator",emoji:"👣",desc:"Find your footprint!",color:"#F59E0B",xp:25},
+    {id:"fight",title:"Pollution Fighter",emoji:"⚔️",desc:"Smash polluters!",color:"#EF4444",xp:25},
   ];
 
   return <div style={{padding:"0 16px 90px"}}>
     <h2 style={{color:"#F8FAFC",fontSize:20,margin:"0 0 4px"}}>Mini Games 🎮</h2>
-    <p style={{color:"#64748B",fontSize:12,margin:"0 0 16px"}}>Learn while having fun!</p>
+    <p style={{color:"#64748B",fontSize:12,margin:"0 0 16px"}}>Games played: {user.gamesPlayed||0}</p>
     <div style={{display:"flex",flexDirection:"column",gap:12}}>
       {games.map(g=><Card key={g.id} onClick={()=>setActive(g.id)} style={{display:"flex",alignItems:"center",gap:14,padding:16,cursor:"pointer",background:`linear-gradient(135deg,${g.color}12,${g.color}06)`,border:`1px solid ${g.color}20`}}>
         <div style={{width:52,height:52,borderRadius:16,display:"flex",alignItems:"center",justifyContent:"center",background:`${g.color}18`,fontSize:26,flexShrink:0}}>{g.emoji}</div>
@@ -747,7 +827,7 @@ export default function App() {
 
   if (!user) return <AuthScreen onLogin={u=>setUser(u)}/>;
 
-  const pages = {home:<Home user={user} setPage={setPage}/>,learn:<Learn user={user} setUser={setUser}/>,stories:<Stories user={user} setUser={setUser}/>,games:<Games user={user} setUser={setUser}/>,garden:<Garden user={user} setUser={setUser}/>,profile:<Profile user={user} setUser={setUser} onLogout={()=>{setUser(null);setPage("home")}}/>};
+  const pages = {home:<Home user={user} setPage={setPage} setUser={setUser}/>,learn:<Learn user={user} setUser={setUser}/>,stories:<Stories user={user} setUser={setUser}/>,games:<Games user={user} setUser={setUser}/>,garden:<Garden user={user} setUser={setUser}/>,profile:<Profile user={user} setUser={setUser} onLogout={()=>{setUser(null);setPage("home")}}/>};
 
   return (
     <div style={{minHeight:"100vh",background:"linear-gradient(145deg,#0F172A 0%,#1E1B4B 50%,#0F172A 100%)",fontFamily:"'Fredoka',sans-serif",color:"#F8FAFC",maxWidth:480,margin:"0 auto",position:"relative",overflow:"hidden"}}>
