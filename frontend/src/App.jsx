@@ -105,6 +105,8 @@ const STORIES = [
     pages:[{t:"Zephyr the new turbine spun her blades — 500 homes lit up!",img:"🌬️💡✨"},{t:"No smoke, no pollution. Clean energy from the wind!",img:"🏠🏠💚"},{t:"The old coal plant got quieter as families chose wind power.",img:"🏭📉🌬️"},{t:"It shut down for good. Bluer sky, cleaner air, happy kids!",img:"☀️👧💙"}],
     quiz:[{q:"One turbine powers:",opts:["5","50","500","5000"],ans:2},{q:"Coal plant:",opts:["Grew","Shut down","Moved","Nothing"],ans:1},{q:"Wind advantage:",opts:["Expensive","No pollution","Loud","Ugly"],ans:1}]},
 ];
+
+const LESSONS = [
   { id:"l1", title:"What is Recycling?", emoji:"♻️", cat:"waste", xp:20, color:"#22C55E",
     content:"Recycling means turning old things into new things! A plastic bottle can become a toy, bench, or t-shirt!",
     qs:[
