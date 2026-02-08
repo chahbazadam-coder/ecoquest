@@ -13,7 +13,7 @@ const DB = {
   users: {},
   createUser(u, p, av) {
     if (this.users[u]) return null;
-    const user = { id: Date.now().toString(36), username: u, password: p, avatar: av || "🌱", level: 1, xp: 0, streak: 1, completedLessons: [], completedStories: [], completedChallenges: [], achievements: [], ecoCoins: 50, garden: [], carbonSaved: 0, gamesPlayed: 0, joinDate: new Date().toISOString() };
+    const user = { id: Date.now().toString(36), username: u, password: p, avatar: av || "🌱", level: 1, xp: 0, streak: 1, completedLessons: [], completedStories: [], completedChallenges: [], achievements: [], ecoCoins: 50, garden: [], carbonSaved: 0, gamesPlayed: 0, pet: null, petName: "", petHappiness: 100, craftedItems: [], quizBest: 0, joinDate: new Date().toISOString() };
     this.users[u] = user;
     return { ...user };
   },
@@ -178,6 +178,9 @@ const GARDEN_SHOP = [
   {id:"p13",name:"Pond",emoji:"🪷",cost:70,type:"feature"},{id:"p14",name:"Bird House",emoji:"🏠",cost:40,type:"feature"},
   {id:"p15",name:"Hedge",emoji:"🌿",cost:30,type:"plant"},{id:"p16",name:"Deer",emoji:"🦌",cost:80,type:"creature"},
   {id:"p17",name:"Owl",emoji:"🦉",cost:65,type:"creature"},{id:"p18",name:"Rabbit",emoji:"🐇",cost:35,type:"creature"},
+  {id:"p13",name:"Pond",emoji:"🪷",cost:70,type:"feature"},{id:"p14",name:"Bird House",emoji:"🏠",cost:40,type:"feature"},
+  {id:"p15",name:"Hedge",emoji:"🌿",cost:30,type:"plant"},{id:"p16",name:"Deer",emoji:"🦌",cost:80,type:"creature"},
+  {id:"p17",name:"Owl",emoji:"🦉",cost:65,type:"creature"},{id:"p18",name:"Rabbit",emoji:"🐇",cost:35,type:"creature"},
 ];
 
 const TIPS = [
@@ -185,6 +188,7 @@ const TIPS = [
   "🚶 Walking to school saves ~1kg CO2!","🌱 One tree absorbs 22kg CO2/year!",
   "♻️ Recycling 1 can = 3 hours of TV energy!","🐝 1/3 of food depends on bees!",
   "📦 Reusing a bag 5x cuts impact by 80%!","🍎 Local food = less transport pollution!",
+  "👕 Buying secondhand saves 6kg CO2/item!","🥤 1 reusable bottle = 167 plastic/year!","🚲 10km cycling saves 2.6kg CO2 vs car!","🌍 Earth warmed 1.1°C since 1880!","🪱 Composting cuts landfill waste 30%!","🐋 Oceans absorb 30% of human CO2!",
   "👕 Buying secondhand saves 6kg CO2 per item!","🥤 1 reusable bottle replaces 167 plastic ones/year!",
   "🚲 Cycling 10km saves 2.6kg CO2 vs driving!","🌍 Earth has warmed 1.1°C since 1880!",
   "🪱 Composting reduces landfill waste by 30%!","🐋 Oceans absorb 30% of human CO2!",
@@ -218,6 +222,65 @@ const ACHIEVEMENTS = [
   {id:"a13",title:"Legend",emoji:"⭐",desc:"Reach Level 10",check:u=>u.level>=10},
   {id:"a14",title:"Challenger",emoji:"🎯",desc:"5 challenges done",check:u=>(u.completedChallenges||[]).length>=5},
 ];
+
+
+// ═══ V3: ECO PETS ═══
+const PETS = [
+  {id:"pet1",name:"Sprout",emoji:"🌱",cost:0,desc:"A seedling that grows with you!",evo:["🌱","🌿","🌳"]},
+  {id:"pet2",name:"Coral",emoji:"🐠",cost:100,desc:"A colorful reef fish!",evo:["🐠","🐟","🐬"]},
+  {id:"pet3",name:"Buzz",emoji:"🐛",cost:80,desc:"Dreams of beautiful wings!",evo:["🐛","🐝","🦋"]},
+  {id:"pet4",name:"Droplet",emoji:"💧",cost:110,desc:"A raindrop's ocean journey!",evo:["💧","🌊","🌈"]},
+  {id:"pet5",name:"Rocky",emoji:"🪨",cost:90,desc:"A pebble becoming a mountain!",evo:["🪨","⛰️","🏔️"]},
+];
+
+// ═══ V3: CRAFTING RECIPES ═══
+const RECIPES = [
+  {id:"c1",name:"Bird Feeder",emoji:"🪺",need:["🌻","🌳"],xp:15},
+  {id:"c2",name:"Butterfly Garden",emoji:"🦋",need:["🌹","🌷"],xp:15},
+  {id:"c3",name:"Fairy Ring",emoji:"🧚",need:["🍄","🍄"],xp:20},
+  {id:"c4",name:"Tree House",emoji:"🏡",need:["🌳","🏠"],xp:25},
+  {id:"c5",name:"Enchanted Pond",emoji:"✨",need:["🪷","🐸"],xp:25},
+  {id:"c6",name:"Nature Reserve",emoji:"🏞️",need:["🌳","🦌","🦉"],xp:50},
+];
+
+// ═══ V3: WORD SCRAMBLE ═══
+const ECO_WORDS = [
+  {word:"RECYCLE",hint:"Turn old into new ♻️"},{word:"OCEAN",hint:"71% of Earth 🌊"},
+  {word:"SOLAR",hint:"Sun energy ☀️"},{word:"FOREST",hint:"Tree home 🌳"},
+  {word:"COMPOST",hint:"Scraps to soil 🪱"},{word:"CARBON",hint:"Footprint gas 👣"},
+  {word:"GLACIER",hint:"Ice river 🏔️"},{word:"CORAL",hint:"Ocean rainforest 🪸"},
+  {word:"HABITAT",hint:"Animal home 🏡"},{word:"CLIMATE",hint:"Long-term weather 🌡️"},
+  {word:"TURBINE",hint:"Wind machine 🌬️"},{word:"SPECIES",hint:"Type of life 🐼"},
+  {word:"OZONE",hint:"UV shield 🛡️"},{word:"EXTINCT",hint:"Gone forever 🦤"},
+  {word:"ORGANIC",hint:"Grown naturally 🥬"},{word:"BIOME",hint:"Large ecosystem 🌎"},
+];
+
+// ═══ V3: SPEED QUIZ ═══
+const SPEED_QS = [
+  {q:"Trees produce...",a:"Oxygen",w:["CO2","Methane","Helium"]},
+  {q:"Largest ocean?",a:"Pacific",w:["Atlantic","Indian","Arctic"]},
+  {q:"Most recycled?",a:"Aluminum",w:["Plastic","Glass","Wood"]},
+  {q:"Earth is __% water",a:"71%",w:["50%","90%","30%"]},
+  {q:"Biggest rainforest?",a:"Amazon",w:["Congo","Borneo","Daintree"]},
+  {q:"Plastic takes __yrs",a:"400+",w:["10","50","100"]},
+  {q:"Wind energy is...",a:"Renewable",w:["Fossil","Nuclear","Chemical"]},
+  {q:"Composting makes...",a:"Soil",w:["Plastic","Metal","Glass"]},
+  {q:"Coral bleaching from...",a:"Warm water",w:["Cold","Fish","Sharks"]},
+  {q:"Bees pollinate __%",a:"75%",w:["10%","25%","50%"]},
+  {q:"Electric cars use...",a:"Batteries",w:["Gas","Coal","Wood"]},
+  {q:"Ozone blocks...",a:"UV rays",w:["Rain","Wind","Sound"]},
+  {q:"Deforestation causes...",a:"Habitat loss",w:["More trees","Rain","Snow"]},
+  {q:"Biggest land animal?",a:"Elephant",w:["Rhino","Hippo","Giraffe"]},
+  {q:"CO2 stands for...",a:"Carbon dioxide",w:["Calcium","Cobalt","Copper"]},
+];
+
+// ═══ V3: RANK SYSTEM ═══
+const RANKS = [{n:"Seedling",e:"🌱",xp:0},{n:"Sprout",e:"🌿",xp:100},{n:"Sapling",e:"🪴",xp:300},{n:"Tree",e:"🌳",xp:600},{n:"Forest",e:"🌲",xp:1000},{n:"Guardian",e:"🛡️",xp:1500},{n:"Champion",e:"🏆",xp:2500},{n:"Legend",e:"⭐",xp:4000},{n:"Earth Hero",e:"🌍",xp:6000},{n:"Planet Savior",e:"💫",xp:10000}];
+const getRank=(xp)=>[...RANKS].reverse().find(r=>xp>=r.xp)||RANKS[0];
+const getNextRank=(xp)=>RANKS.find(r=>r.xp>xp)||RANKS[RANKS.length-1];
+
+// ═══ V3: ECO FACTS ═══
+const ECO_FACTS = ["🌳 One tree absorbs 48lbs CO2/year","🌊 Ocean makes 50%+ of oxygen","♻️ 1 ton recycled paper saves 17 trees","💡 LEDs use 75% less energy","🚰 Leaky faucet: 3,000 gal/year wasted","🌴 Rainforests = 50% of all species","🥤 Plastic bottle: 450 years to decompose","🌬️ Wind farms power millions of homes","🐝 Bees = 1 in 3 bites of food","🗑️ Average person: 4.4lbs trash/day","🐋 Oceans absorb 30% of CO2","🌡️ Earth warmed 1.1°C since 1880","🦠 Soil has more organisms than stars in galaxy","🚲 Cycling 10km saves 2.6kg CO2 vs driving"];
 
 // ═══ SMALL COMPONENTS ═══
 const XPBar = ({cur,max,color="#22C55E",h=12}) => (
@@ -350,6 +413,7 @@ const Header = ({user}) => (
 
 // ═══ HOME DASHBOARD ═══
 const Home = ({user,setPage,setUser}) => {
+  const [showFacts,setShowFacts] = useState(false);
   const tip = TIPS[new Date().getDate()%TIPS.length];
   const dc = DAILY_CHALLENGES[new Date().getDay()%DAILY_CHALLENGES.length];
   const dcDone = (user.completedChallenges||[]).includes(dc.id);
@@ -387,6 +451,12 @@ const Home = ({user,setPage,setUser}) => {
       <p style={{margin:0,fontSize:13,color:"#CBD5E1",lineHeight:1.5}}>{tip}</p>
     </Card>
 
+    <Card onClick={()=>setShowFacts(true)} style={{marginBottom:16,cursor:"pointer",background:"linear-gradient(135deg,rgba(20,184,166,.1),rgba(20,184,166,.04))",border:"1px solid rgba(20,184,166,.15)"}}>
+      <div style={{display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:24}}>📖</span><div><div style={{fontSize:13,fontWeight:700,color:"#14B8A6"}}>Eco Facts Diary</div><div style={{fontSize:10,color:"#94A3B8"}}>Tap to learn random facts!</div></div></div>
+    </Card>
+    <Modal open={showFacts} onClose={()=>setShowFacts(false)} title="📖 Eco Facts">
+      <div style={{display:"flex",flexDirection:"column",gap:8}}>{ECO_FACTS.map((f,i)=><Card key={i} style={{padding:12}}><p style={{margin:0,fontSize:13,color:"#CBD5E1"}}>{f}</p></Card>)}</div>
+    </Modal>
     <h3 style={{color:"#F8FAFC",fontSize:15,margin:"0 0 10px"}}>Continue Learning</h3>
     <div style={{display:"flex",flexDirection:"column",gap:8}}>
       {LESSONS.filter(l=>!user.completedLessons.includes(l.id)).slice(0,2).map(l=>
@@ -685,12 +755,67 @@ const Games = ({user,setUser}) => {
   if(active==="carbon") return <CarbonCalc/>;
   if(active==="fight") return <PollutionFighter/>;
 
+  // V3: Word Scramble
+  const WordScramble=()=>{const[wi,setWi]=useState(0);const[guess,setGuess]=useState("");const[sc,setSc]=useState(0);const[fb,setFb]=useState(null);
+    const words=useRef([...ECO_WORDS].sort(()=>Math.random()-.5).slice(0,8));const scramble=(w)=>w.split("").sort(()=>Math.random()-.5).join("");
+    if(wi>=words.current.length)return<div style={{textAlign:"center",padding:30}}><div style={{fontSize:64}}>📝</div><h2 style={{color:"#F8FAFC"}}>{sc}/{words.current.length} words!</h2>{sc>=5&&<p style={{color:"#22C55E",fontWeight:700}}>+30 XP!</p>}<Btn onClick={()=>done(sc>=5?30:10)}sz="lg"style={{marginTop:16}}>Done</Btn></div>;
+    const cur=words.current[wi];const scr=scramble(cur.word);
+    const check=()=>{if(guess.toUpperCase()===cur.word){setSc(s=>s+1);setFb("✅");setTimeout(()=>{setFb(null);setGuess("");setWi(w=>w+1)},600)}else{setFb("❌");setTimeout(()=>setFb(null),600)}};
+    return<div style={{padding:"16px 16px 90px"}}><button onClick={()=>setActive(null)}style={{background:"none",border:"none",color:"#64748B",fontSize:13,cursor:"pointer",fontFamily:"'Fredoka',sans-serif",marginBottom:12}}>← Back</button>
+      <h3 style={{color:"#F8FAFC",textAlign:"center"}}>📝 Word Scramble ({wi+1}/{words.current.length})</h3><XPBar cur={wi}max={words.current.length}color="#EC4899"h={6}/>
+      <div style={{textAlign:"center",margin:"24px 0"}}><div style={{fontSize:32,letterSpacing:8,color:"#F59E0B",fontWeight:700,marginBottom:8}}>{scr}</div><p style={{color:"#94A3B8",fontSize:12}}>{cur.hint}</p></div>
+      <div style={{display:"flex",gap:8}}><input value={guess}onChange={e=>setGuess(e.target.value)}onKeyDown={e=>e.key==="Enter"&&check()}placeholder="Type the word..."style={{flex:1,padding:"12px 16px",borderRadius:14,border:"2px solid rgba(255,255,255,.1)",background:"rgba(255,255,255,.05)",color:"#F8FAFC",fontSize:16,fontFamily:"'Fredoka',sans-serif",outline:"none",textTransform:"uppercase",letterSpacing:3,boxSizing:"border-box"}}/><Btn onClick={check}>Go</Btn></div>
+      {fb&&<div style={{textAlign:"center",marginTop:12,fontSize:24}}>{fb}</div>}
+    </div>;
+  };
+
+  // V3: Speed Quiz
+  const SpeedQuiz=()=>{const[qi,setQi]=useState(0);const[sc,setSc]=useState(0);const[tm,setTm]=useState(30);const ov=tm<=0||qi>=SPEED_QS.length;
+    const qs=useRef([...SPEED_QS].sort(()=>Math.random()-.5));
+    useEffect(()=>{if(ov)return;const t=setInterval(()=>setTm(t=>t-1),1000);return()=>clearInterval(t)},[ov]);
+    if(ov)return<div style={{textAlign:"center",padding:30}}><div style={{fontSize:64}}>⚡</div><h2 style={{color:"#F8FAFC"}}>{sc} correct!</h2>{sc>=6&&<p style={{color:"#22C55E",fontWeight:700}}>+30 XP!</p>}<Btn onClick={()=>done(sc>=6?30:10)}sz="lg"style={{marginTop:16}}>Done</Btn></div>;
+    const q=qs.current[qi];const opts=useRef([q.a,...q.w].sort(()=>Math.random()-.5));
+    useEffect(()=>{if(qi<qs.current.length){const q2=qs.current[qi];opts.current=[q2.a,...q2.w].sort(()=>Math.random()-.5)}},[qi]);
+    return<div style={{padding:"16px 16px 90px"}}><button onClick={()=>setActive(null)}style={{background:"none",border:"none",color:"#64748B",fontSize:13,cursor:"pointer",fontFamily:"'Fredoka',sans-serif",marginBottom:8}}>← Back</button>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:10}}><span style={{color:"#22C55E",fontWeight:700}}>⚡ {sc}</span><span style={{color:tm<=10?"#EF4444":"#F8FAFC",fontWeight:700,fontSize:tm<=5?20:14,transition:"all .3s"}}>⏱ {tm}s</span></div>
+      <h3 style={{color:"#F8FAFC",fontSize:18,textAlign:"center",margin:"16px 0"}}>{q.q}</h3>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>{opts.current.map((o,i)=><button key={o+i}onClick={()=>{if(o===q.a)setSc(s=>s+1);setQi(qi+1)}}style={{padding:"14px",borderRadius:14,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",color:"#E2E8F0",fontSize:14,cursor:"pointer",fontFamily:"'Fredoka',sans-serif"}}>{o}</button>)}</div>
+    </div>;
+  };
+
+  // V3: Ecosystem Builder
+  const EcoBuilder=()=>{const[eco,setEco]=useState({water:50,air:50,soil:50,bio:50});const[turn,setTurn]=useState(0);const[log,setLog]=useState([]);const maxT=8;
+    const actions=[
+      {n:"Plant Trees",e:"🌳",eff:{air:15,soil:10,bio:10,water:5}},
+      {n:"Clean River",e:"🏞️",eff:{water:20,bio:10,soil:5,air:0}},
+      {n:"Build Wind Farm",e:"🌬️",eff:{air:15,water:0,soil:-5,bio:5}},
+      {n:"Create Wetland",e:"🐸",eff:{water:15,bio:20,soil:5,air:5}},
+      {n:"Start Recycling",e:"♻️",eff:{soil:15,air:10,water:5,bio:5}},
+      {n:"Protect Species",e:"🦁",eff:{bio:25,water:0,soil:0,air:0}},
+    ];
+    const act=(a)=>{if(turn>=maxT)return;const ne={};Object.keys(eco).forEach(k=>{ne[k]=Math.min(100,Math.max(0,eco[k]+(a.eff[k]||0)))});setEco(ne);setTurn(turn+1);setLog([...log,a.n])};
+    const avg=Math.round((eco.water+eco.air+eco.soil+eco.bio)/4);
+    if(turn>=maxT)return<div style={{textAlign:"center",padding:30}}><div style={{fontSize:64}}>{avg>=75?"🌍":avg>=50?"🌱":"🏜️"}</div><h2 style={{color:"#F8FAFC"}}>Ecosystem: {avg}%</h2><p style={{color:"#94A3B8"}}>{avg>=75?"Thriving!":avg>=50?"Healthy":"Needs work"}</p>{avg>=60&&<p style={{color:"#22C55E",fontWeight:700}}>+30 XP!</p>}<Btn onClick={()=>done(avg>=60?30:10)}sz="lg"style={{marginTop:16}}>Done</Btn></div>;
+    return<div style={{padding:"16px 16px 90px"}}><button onClick={()=>setActive(null)}style={{background:"none",border:"none",color:"#64748B",fontSize:13,cursor:"pointer",fontFamily:"'Fredoka',sans-serif",marginBottom:12}}>← Back</button>
+      <h3 style={{color:"#F8FAFC",textAlign:"center",margin:"0 0 4px"}}>🌎 Ecosystem Builder</h3><p style={{color:"#64748B",textAlign:"center",fontSize:11,margin:"0 0 12px"}}>Turn {turn}/{maxT} — Balance your ecosystem!</p>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:14}}>{[{k:"water",l:"💧 Water",c:"#0EA5E9"},{k:"air",l:"🌬️ Air",c:"#22C55E"},{k:"soil",l:"🪨 Soil",c:"#A16207"},{k:"bio",l:"🦋 Biodiv.",c:"#A855F7"}].map(s=><div key={s.k}style={{padding:8,borderRadius:12,background:"rgba(255,255,255,.04)"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}><span style={{fontSize:10,color:"#94A3B8"}}>{s.l}</span><span style={{fontSize:10,color:s.c,fontWeight:700}}>{eco[s.k]}%</span></div><XPBar cur={eco[s.k]}max={100}color={s.c}h={8}/></div>)}</div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>{actions.map((a,i)=><button key={i}onClick={()=>act(a)}style={{padding:"10px",borderRadius:14,background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.08)",color:"#E2E8F0",fontSize:12,cursor:"pointer",fontFamily:"'Fredoka',sans-serif",textAlign:"center"}}><div style={{fontSize:22}}>{a.e}</div>{a.n}</button>)}</div>
+    </div>;
+  };
+
+  if(active==="scramble") return <WordScramble/>;
+  if(active==="speed") return <SpeedQuiz/>;
+  if(active==="eco") return <EcoBuilder/>;
+
   const games = [
     {id:"sort",title:"Eco Sorter",emoji:"🗑️",desc:"Sort waste into bins!",color:"#22C55E",xp:20},
     {id:"water",title:"Water Drop Quest",emoji:"💧",desc:"Catch falling drops!",color:"#0EA5E9",xp:20},
     {id:"memory",title:"Eco Memory Match",emoji:"🧠",desc:"Match eco-symbol pairs!",color:"#8B5CF6",xp:25},
     {id:"carbon",title:"Carbon Calculator",emoji:"👣",desc:"Find your footprint!",color:"#F59E0B",xp:25},
     {id:"fight",title:"Pollution Fighter",emoji:"⚔️",desc:"Smash polluters!",color:"#EF4444",xp:25},
+    {id:"scramble",title:"Word Scramble",emoji:"📝",desc:"Unscramble eco-words!",color:"#EC4899",xp:30},
+    {id:"speed",title:"Speed Quiz",emoji:"⚡",desc:"Race the clock!",color:"#F97316",xp:30},
+    {id:"eco",title:"Ecosystem Builder",emoji:"🌎",desc:"Build & balance an ecosystem!",color:"#14B8A6",xp:30},
   ];
 
   return <div style={{padding:"0 16px 90px"}}>
@@ -713,63 +838,55 @@ const Games = ({user,setUser}) => {
 // ═══ GARDEN ═══
 const Garden = ({user,setUser}) => {
   const [shop,setShop] = useState(false);
-  const buy = (item) => {
-    if(user.ecoCoins<item.cost) return;
-    const u = DB.update(user.username,{ecoCoins:user.ecoCoins-item.cost,garden:[...user.garden,{...item,at:Date.now()}]});
-    setUser(u);
-  };
+  const [tab,setTab] = useState("garden");
+  const buy=(item)=>{if(user.ecoCoins<item.cost)return;DB.update(user.username,{ecoCoins:user.ecoCoins-item.cost,garden:[...user.garden,{...item,at:Date.now()}]});setUser(DB.get(user.username))};
+  const adoptPet=(pet)=>{if(user.pet||user.ecoCoins<pet.cost)return;DB.update(user.username,{pet:pet.id,petName:pet.name,petHappiness:100,ecoCoins:user.ecoCoins-pet.cost});setUser(DB.get(user.username))};
+  const feedPet=()=>{if(!user.pet)return;DB.update(user.username,{petHappiness:Math.min(100,(user.petHappiness||50)+20)});DB.addXP(user.username,5);setUser(DB.get(user.username))};
+  const craft=(recipe)=>{const ge=user.garden.map(g=>g.emoji);const ok=recipe.need.every(n=>ge.filter(e=>e===n).length>=recipe.need.filter(x=>x===n).length);if(!ok)return;let rem=[...user.garden];recipe.need.forEach(n=>{const i=rem.findIndex(g=>g.emoji===n);if(i>=0)rem.splice(i,1)});rem.push({name:recipe.name,emoji:recipe.emoji,type:"crafted",at:Date.now()});DB.update(user.username,{garden:rem,craftedItems:[...(user.craftedItems||[]),recipe.id]});DB.addXP(user.username,recipe.xp);setUser(DB.get(user.username))};
+  const petData=PETS.find(p=>p.id===user.pet);const petStage=petData?Math.min(Math.floor((user.level||1)/3),petData.evo.length-1):0;
 
   return <div style={{padding:"0 16px 90px"}}>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-      <div>
-        <h2 style={{color:"#F8FAFC",fontSize:20,margin:0}}>My Eco Garden 🌻</h2>
-        <p style={{color:"#64748B",fontSize:12,margin:"2px 0 0"}}>Spend EcoCoins to grow!</p>
-      </div>
-      <Btn onClick={()=>setShop(true)} v="gold" sz="sm">🛒 Shop</Btn>
+    <div style={{display:"flex",background:"rgba(255,255,255,.05)",borderRadius:14,padding:3,marginBottom:14,border:"1px solid rgba(255,255,255,.06)"}}>
+      {[{id:"garden",l:"🌻 Garden"},{id:"pet",l:"🐾 Pet"},{id:"craft",l:"🔨 Craft"}].map(t=><button key={t.id}onClick={()=>setTab(t.id)}style={{flex:1,padding:"8px 0",borderRadius:11,border:"none",fontFamily:"'Fredoka',sans-serif",fontSize:12,fontWeight:600,cursor:"pointer",background:tab===t.id?"linear-gradient(135deg,#22C55E,#16A34A)":"transparent",color:tab===t.id?"#fff":"#64748B"}}>{t.l}</button>)}
     </div>
 
-    {!user.garden.length?
-      <Card style={{textAlign:"center",padding:36}}>
-        <div style={{fontSize:44,marginBottom:10}}>🌱</div>
-        <p style={{color:"#94A3B8",fontSize:14}}>Your garden is empty!</p>
-        <p style={{color:"#64748B",fontSize:12}}>Earn EcoCoins from lessons & games!</p>
-        <Btn onClick={()=>setShop(true)} v="gold" sz="md" style={{marginTop:10}}>🛒 Shop</Btn>
+    {tab==="garden"&&<>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}><h2 style={{color:"#F8FAFC",fontSize:18,margin:0}}>Garden ({user.garden.length})</h2><Btn onClick={()=>setShop(true)}v="gold"sz="sm">🛒 Shop</Btn></div>
+      {!user.garden.length?<Card style={{textAlign:"center",padding:36}}><div style={{fontSize:44}}>🌱</div><p style={{color:"#94A3B8"}}>Empty! Buy plants to grow your garden!</p><Btn onClick={()=>setShop(true)}v="gold"style={{marginTop:10}}>🛒 Shop</Btn></Card>
+      :<div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6,background:"rgba(34,197,94,.04)",borderRadius:20,padding:12,border:"1px solid rgba(34,197,94,.1)"}}>
+        {user.garden.map((it,i)=><div key={i}style={{display:"flex",flexDirection:"column",alignItems:"center",padding:5,borderRadius:12,background:it.type==="crafted"?"rgba(245,158,11,.08)":"rgba(255,255,255,.03)",border:it.type==="crafted"?"1px solid rgba(245,158,11,.3)":"1px solid rgba(255,255,255,.05)",aspectRatio:"1",justifyContent:"center"}}><span style={{fontSize:24}}>{it.emoji}</span><span style={{fontSize:7,color:it.type==="crafted"?"#F59E0B":"#94A3B8"}}>{it.name}</span></div>)}
+      </div>}
+      <Modal open={shop}onClose={()=>setShop(false)}title="🛒 Eco Shop"><div style={{display:"flex",alignItems:"center",gap:6,marginBottom:14,padding:"7px 12px",background:"rgba(245,158,11,.1)",borderRadius:10}}><span>🪙</span><span style={{color:"#F59E0B",fontWeight:700}}>{user.ecoCoins}</span></div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>{GARDEN_SHOP.map(it=>{const ok=user.ecoCoins>=it.cost;return<button key={it.id}onClick={()=>ok&&buy(it)}style={{padding:10,borderRadius:14,textAlign:"center",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.07)",cursor:ok?"pointer":"not-allowed",opacity:ok?1:.4,fontFamily:"'Fredoka',sans-serif"}}><div style={{fontSize:24}}>{it.emoji}</div><div style={{fontSize:10,color:"#F8FAFC",fontWeight:600}}>{it.name}</div><div style={{fontSize:10,color:"#F59E0B"}}>🪙 {it.cost}</div></button>})}</div></Modal>
+    </>}
+
+    {tab==="pet"&&<>
+      <h2 style={{color:"#F8FAFC",fontSize:18,margin:"0 0 12px"}}>Eco Pet 🐾</h2>
+      {user.pet?<Card style={{textAlign:"center",padding:24,background:"linear-gradient(135deg,rgba(139,92,246,.1),rgba(139,92,246,.04))",border:"1px solid rgba(139,92,246,.15)"}}>
+        <div style={{fontSize:64,marginBottom:8}}>{petData.evo[petStage]}</div>
+        <h3 style={{color:"#F8FAFC",margin:"0 0 4px"}}>{user.petName}</h3>
+        <p style={{color:"#A78BFA",fontSize:12,margin:"0 0 12px"}}>Stage {petStage+1}/{petData.evo.length} — Evolves every 3 levels!</p>
+        <div style={{marginBottom:12}}><div style={{fontSize:10,color:"#94A3B8",marginBottom:4}}>Happiness: {user.petHappiness||50}%</div><XPBar cur={user.petHappiness||50}max={100}color="#A855F7"h={10}/></div>
+        <Btn onClick={feedPet}v="purple"sz="md">🍃 Feed Pet (+5 XP)</Btn>
       </Card>
-    :
-      <div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6,background:"linear-gradient(135deg,rgba(34,197,94,.06),rgba(34,197,94,.02))",borderRadius:20,padding:12,border:"1px solid rgba(34,197,94,.1)",minHeight:180}}>
-        {user.garden.map((it,i)=><div key={i} style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:6,borderRadius:12,background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.05)",aspectRatio:"1"}}>
-          <span style={{fontSize:28}}>{it.emoji}</span>
-          <span style={{fontSize:8,color:"#94A3B8",marginTop:1}}>{it.name}</span>
-        </div>)}
-        {Array.from({length:Math.max(0,12-user.garden.length)}).map((_,i)=><div key={`e${i}`} onClick={()=>setShop(true)} style={{display:"flex",alignItems:"center",justifyContent:"center",borderRadius:12,background:"rgba(255,255,255,.02)",border:"1px dashed rgba(255,255,255,.05)",aspectRatio:"1",cursor:"pointer"}}><span style={{fontSize:16,opacity:.25}}>+</span></div>)}
-      </div>
-    }
+      :<><p style={{color:"#94A3B8",fontSize:13,marginBottom:16}}>Adopt a companion! It evolves as you level up!</p>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>{PETS.map(p=>{const ok=user.ecoCoins>=p.cost;return<Card key={p.id}onClick={()=>ok&&adoptPet(p)}style={{textAlign:"center",padding:14,cursor:ok?"pointer":"not-allowed",opacity:ok?1:.5}}>
+          <div style={{fontSize:36}}>{p.emoji}</div><div style={{fontSize:13,fontWeight:700,color:"#F8FAFC",marginTop:4}}>{p.name}</div><div style={{fontSize:10,color:"#94A3B8"}}>{p.desc}</div>
+          <div style={{fontSize:12,color:"#F59E0B",marginTop:4}}>{p.cost===0?"FREE!":"🪙 "+p.cost}</div>
+          <div style={{fontSize:9,color:"#64748B",marginTop:2}}>{p.evo.join(" → ")}</div>
+        </Card>})}</div>
+      </>}
+    </>}
 
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginTop:14}}>
-      {[{e:"🌳",v:user.garden.filter(g=>g.type==="tree").length,l:"Trees",c:"#22C55E"},{e:"🌺",v:user.garden.filter(g=>g.type==="flower").length,l:"Flowers",c:"#F472B6"},{e:"🦋",v:user.garden.filter(g=>g.type==="creature").length,l:"Creatures",c:"#A855F7"}].map((s,i)=>
-        <Card key={i} style={{textAlign:"center",padding:10}}>
-          <div style={{fontSize:18}}>{s.e}</div>
-          <div style={{fontSize:15,fontWeight:700,color:s.c}}>{s.v}</div>
-          <div style={{fontSize:9,color:"#64748B"}}>{s.l}</div>
-        </Card>
-      )}
-    </div>
-
-    <Modal open={shop} onClose={()=>setShop(false)} title="🛒 Eco Shop">
-      <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:14,padding:"7px 12px",background:"rgba(245,158,11,.1)",borderRadius:10}}>
-        <span style={{fontSize:18}}>🪙</span><span style={{color:"#F59E0B",fontWeight:700,fontSize:15}}>{user.ecoCoins} EcoCoins</span>
-      </div>
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-        {GARDEN_SHOP.map(it=>{
-          const ok=user.ecoCoins>=it.cost;
-          return <button key={it.id} onClick={()=>ok&&buy(it)} style={{padding:12,borderRadius:14,textAlign:"center",background:ok?"rgba(255,255,255,.05)":"rgba(255,255,255,.02)",border:"1px solid rgba(255,255,255,.07)",cursor:ok?"pointer":"not-allowed",opacity:ok?1:.4,fontFamily:"'Fredoka',sans-serif"}}>
-            <div style={{fontSize:28}}>{it.emoji}</div>
-            <div style={{fontSize:12,color:"#F8FAFC",fontWeight:600,marginTop:3}}>{it.name}</div>
-            <div style={{fontSize:11,color:"#F59E0B",fontWeight:600}}>🪙 {it.cost}</div>
-          </button>;
-        })}
-      </div>
-    </Modal>
+    {tab==="craft"&&<>
+      <h2 style={{color:"#F8FAFC",fontSize:18,margin:"0 0 4px"}}>Crafting 🔨</h2>
+      <p style={{color:"#94A3B8",fontSize:11,marginBottom:14}}>Combine garden items to make special things!</p>
+      {RECIPES.map(r=>{const ge=user.garden.map(g=>g.emoji);const ok=r.need.every(n=>ge.filter(e=>e===n).length>=r.need.filter(x=>x===n).length);const dn=(user.craftedItems||[]).includes(r.id);
+        return<Card key={r.id}style={{display:"flex",alignItems:"center",gap:12,padding:14,marginBottom:8,opacity:dn?.5:1,border:ok&&!dn?"1px solid rgba(34,197,94,.2)":"1px solid rgba(255,255,255,.06)"}}>
+          <span style={{fontSize:28}}>{dn?"✅":r.emoji}</span>
+          <div style={{flex:1}}><div style={{fontSize:13,fontWeight:600,color:"#F8FAFC"}}>{r.name}</div><div style={{fontSize:10,color:"#94A3B8"}}>Needs: {r.need.join(" + ")} • +{r.xp}XP</div></div>
+          {!dn&&<Btn onClick={()=>ok&&craft(r)}v={ok?"primary":"ghost"}sz="sm"disabled={!ok}>{ok?"Craft!":"Need items"}</Btn>}
+        </Card>})}
+    </>}
   </div>;
 };
 
@@ -782,7 +899,8 @@ const Profile = ({user,setUser,onLogout}) => {
     <div style={{textAlign:"center",marginBottom:20}}>
       <div style={{fontSize:56,marginBottom:6}}>{user.avatar}</div>
       <h2 style={{color:"#F8FAFC",margin:"0 0 2px",fontSize:22}}>{user.username}</h2>
-      <p style={{color:"#22C55E",margin:0,fontSize:13,fontWeight:600}}>Level {user.level} Eco Hero</p>
+      <div style={{display:"inline-flex",alignItems:"center",gap:6,padding:"4px 14px",borderRadius:20,background:"linear-gradient(135deg,rgba(34,197,94,.15),rgba(34,197,94,.05))",border:"1px solid rgba(34,197,94,.2)"}}><span style={{fontSize:16}}>{getRank(user.xp).e}</span><span style={{color:"#22C55E",fontSize:13,fontWeight:700}}>Lv.{user.level} {getRank(user.xp).n}</span></div>
+      {getNextRank(user.xp).xp>user.xp&&<p style={{color:"#64748B",fontSize:10,marginTop:4}}>{getNextRank(user.xp).xp-user.xp} XP to {getNextRank(user.xp).n}</p>}
     </div>
 
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:20}}>
